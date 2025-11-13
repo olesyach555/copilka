@@ -1,0 +1,57 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A9720F2A-08FB-4186-A5AB-309E1F1F0FA3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kopilka.Shared", "src\Kopilka.Shared\Kopilka.Shared.csproj", "{4EA6D12C-7539-4C51-BE77-2DF803AC823E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kopilka.DataAccess", "src\Kopilka.DataAccess\Kopilka.DataAccess.csproj", "{DC6FC8AD-F08F-47F6-AF1D-A02E1ACF6E21}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kopilka.BusinessLogic", "src\Kopilka.BusinessLogic\Kopilka.BusinessLogic.csproj", "{65AA499E-2164-4D8A-819E-AFD95E66C2A1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kopilka.FinanceManager", "src\Kopilka.FinanceManager\Kopilka.FinanceManager.csproj", "{7B24003F-170F-4494-A99C-A21CA007984D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{49E54EF2-7662-4607-B41D-DCEEC2F4D0A8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kopilka.Tests", "tests\Kopilka.Tests\Kopilka.Tests.csproj", "{F0F52067-751A-4450-9D02-49DC3871E0C0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4EA6D12C-7539-4C51-BE77-2DF803AC823E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4EA6D12C-7539-4C51-BE77-2DF803AC823E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4EA6D12C-7539-4C51-BE77-2DF803AC823E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4EA6D12C-7539-4C51-BE77-2DF803AC823E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC6FC8AD-F08F-47F6-AF1D-A02E1ACF6E21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC6FC8AD-F08F-47F6-AF1D-A02E1ACF6E21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC6FC8AD-F08F-47F6-AF1D-A02E1ACF6E21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC6FC8AD-F08F-47F6-AF1D-A02E1ACF6E21}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65AA499E-2164-4D8A-819E-AFD95E66C2A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65AA499E-2164-4D8A-819E-AFD95E66C2A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65AA499E-2164-4D8A-819E-AFD95E66C2A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65AA499E-2164-4D8A-819E-AFD95E66C2A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B24003F-170F-4494-A99C-A21CA007984D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B24003F-170F-4494-A99C-A21CA007984D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B24003F-170F-4494-A99C-A21CA007984D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B24003F-170F-4494-A99C-A21CA007984D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F0F52067-751A-4450-9D02-49DC3871E0C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0F52067-751A-4450-9D02-49DC3871E0C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0F52067-751A-4450-9D02-49DC3871E0C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0F52067-751A-4450-9D02-49DC3871E0C0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4EA6D12C-7539-4C51-BE77-2DF803AC823E} = {A9720F2A-08FB-4186-A5AB-309E1F1F0FA3}
+		{DC6FC8AD-F08F-47F6-AF1D-A02E1ACF6E21} = {A9720F2A-08FB-4186-A5AB-309E1F1F0FA3}
+		{65AA499E-2164-4D8A-819E-AFD95E66C2A1} = {A9720F2A-08FB-4186-A5AB-309E1F1F0FA3}
+		{7B24003F-170F-4494-A99C-A21CA007984D} = {A9720F2A-08FB-4186-A5AB-309E1F1F0FA3}
+		{F0F52067-751A-4450-9D02-49DC3871E0C0} = {49E54EF2-7662-4607-B41D-DCEEC2F4D0A8}
+	EndGlobalSection
+EndGlobal
