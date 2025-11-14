@@ -26,14 +26,14 @@ namespace Kopilka.FinanceManager
 
             if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(password))
             {
-                MessageBox.Show("Пожалуйста, введите логин и пароль.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ShowError("Пожалуйста, введите логин и пароль.");
                 return;
             }
 
             var existingUser = await _userService.GetUserByLoginAsync(login);
             if (existingUser != null)
             {
-                MessageBox.Show("Пользователь с таким логином уже существует.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ShowError("Пользователь с таким логином уже существует.");
                 return;
             }
 
@@ -44,6 +44,27 @@ namespace Kopilka.FinanceManager
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
             MessageBox.Show("Логика входа будет реализована в следующей итерации.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private void ShowError(string message)
+        {
+            ErrorTextBlock.Text = message;
+            ErrorBorder.Visibility = Visibility.Visible;
+        }
+
+        private void HideError()
+        {
+            ErrorBorder.Visibility = Visibility.Collapsed;
+        }
+
+        private void CloseErrorButton_Click(object sender, RoutedEventArgs e)
+        {
+            HideError();
+        }
+
+        private void Input_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            HideError();
         }
     }
 }
