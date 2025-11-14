@@ -66,5 +66,10 @@ namespace Kopilka.FinanceManager
         {
             HideError();
         }
+
+        private void Password_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            HideError();
+        }
     }
 }
