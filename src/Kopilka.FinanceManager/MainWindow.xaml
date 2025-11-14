@@ -5,8 +5,22 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Kopilka.FinanceManager"
         mc:Ignorable="d"
-        Title="Kopilka Finance Manager" Height="450" Width="800">
+        Title="Kopilka - Вход" Height="450" Width="400"
+        WindowStartupLocation="CenterScreen">
     <Grid>
-        <TextBlock Text="Welcome to Kopilka!" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24"/>
+        <Border CornerRadius="10" BorderBrush="LightGray" BorderThickness="1" Padding="20" Margin="20">
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock Text="Вход в Копилку" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+
+                <TextBlock Text="Логин:" Margin="0,0,0,5"/>
+                <TextBox x:Name="LoginTextBox" Padding="5"/>
+
+                <TextBlock Text="Пароль:" Margin="0,10,0,5"/>
+                <PasswordBox x:Name="PasswordBox" Padding="5"/>
+
+                <Button x:Name="LoginButton" Content="Войти" Padding="10" Margin="0,20,0,0" Click="LoginButton_Click"/>
+                <Button x:Name="RegisterButton" Content="Регистрация" Padding="10" Margin="0,10,0,0" Click="RegisterButton_Click"/>
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>

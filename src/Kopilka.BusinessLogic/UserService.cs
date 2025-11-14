@@ -1,5 +1,6 @@
 using Kopilka.DataAccess;
 using Kopilka.Shared;
+using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
 namespace Kopilka.BusinessLogic
@@ -28,6 +29,36 @@ namespace Kopilka.BusinessLogic
         public async Task<User?> GetUserByIdAsync(int id)
         {
             return await _context.Users.FindAsync(id);
+        }
+
+        /// <summary>
+        /// Асинхронно находит пользователя по его логину.
+        /// </summary>
+        /// <param name="login">Логин пользователя.</param>
+        /// <returns>Найденный пользователь или null, если пользователь не найден.</returns>
+        public async Task<User?> GetUserByLoginAsync(string login)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.Login == login);
+        }
+
+        /// <summary>
+        /// Асинхронно регистрирует нового пользователя.
+        /// </summary>
+        /// <param name="login">Логин нового пользователя.</param>
+        /// <param name="password">Пароль нового пользователя.</param>
+        /// <returns>Созданный пользователь.</returns>
+        public async Task<User> RegisterUserAsync(string login, string password)
+        {
+            var user = new User
+            {
+                Login = login,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
+                Role = "User" // По умолчанию все новые пользователи - обычные пользователи
+            };
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+            return user;
         }
     }
 }
