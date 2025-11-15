@@ -60,5 +60,23 @@ namespace Kopilka.BusinessLogic
             await _context.SaveChangesAsync();
             return user;
         }
+
+        /// <summary>
+        /// Асинхронно выполняет вход пользователя в систему.
+        /// </summary>
+        /// <param name="login">Логин пользователя.</param>
+        /// <param name="password">Пароль пользователя.</param>
+        /// <returns>Объект пользователя в случае успеха, иначе — null.</returns>
+        public async Task<User?> LoginAsync(string login, string password)
+        {
+            var user = await GetUserByLoginAsync(login);
+
+            if (user != null && BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+            {
+                return user;
+            }
+
+            return null;
+        }
     }
 }

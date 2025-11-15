@@ -41,9 +41,29 @@ namespace Kopilka.FinanceManager
             MessageBox.Show($"Пользователь {newUser.Login} успешно зарегистрирован!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
-        private void LoginButton_Click(object sender, RoutedEventArgs e)
+        private async void LoginButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Логика входа будет реализована в следующей итерации.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+            var login = LoginTextBox.Text;
+            var password = PasswordBox.Password;
+
+            if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(password))
+            {
+                ShowError("Пожалуйста, введите логин и пароль.");
+                return;
+            }
+
+            var user = await _userService.LoginAsync(login, password);
+
+            if (user != null)
+            {
+                var dashboard = new DashboardWindow(user);
+                dashboard.Show();
+                this.Close();
+            }
+            else
+            {
+                ShowError("Неверный логин или пароль.");
+            }
         }
 
         private void ShowError(string message)

@@ -1,5 +1,9 @@
 using Kopilka.DataAccess;
 using Kopilka.Shared;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Kopilka.BusinessLogic
@@ -11,23 +15,66 @@ namespace Kopilka.BusinessLogic
     {
         private readonly KopilkaDbContext _context;
 
-        /// <summary>
-        /// Инициализирует новый экземпляр класса <see cref="TransactionService"/>.
-        /// </summary>
-        /// <param name="context">Контекст базы данных.</param>
         public TransactionService(KopilkaDbContext context)
         {
             _context = context;
         }
 
         /// <summary>
-        /// Асинхронно добавляет новую транзакцию.
+        /// Асинхронно получает список транзакций для пользователя за указанный период.
         /// </summary>
-        /// <param name="transaction">Транзакция для добавления.</param>
-        public async Task AddTransactionAsync(Transaction transaction)
+        /// <param name="userId">ID пользователя.</param>
+        /// <param name="startDate">Начальная дата периода.</param>
+        /// <param name="endDate">Конечная дата периода.</param>
+        /// <returns>Список транзакций.</returns>
+        public async Task<List<Transaction>> GetTransactionsForUserAsync(int userId, DateTime startDate, DateTime endDate)
         {
-            _context.Transactions.Add(transaction);
-            await _context.SaveChangesAsync();
+            var userAccountIds = await _context.Accounts
+                .Where(a => a.UserId == userId)
+                .Select(a => a.Id)
+                .ToListAsync();
+
+            return await _context.Transactions
+                .Where(t => userAccountIds.Contains(t.AccountId))
+                .Where(t => t.Date >= startDate && t.Date <= endDate)
+                .Include(t => t.Category)
+                .ToListAsync();
+        }
+
+        /// <summary>
+        /// Асинхронно вычисляет общую сумму доходов пользователя за период.
+        /// </summary>
+        public async Task<decimal> GetTotalIncomeAsync(int userId, DateTime startDate, DateTime endDate)
+        {
+            var userAccountIds = await _context.Accounts
+                .Where(a => a.UserId == userId)
+                .Select(a => a.Id)
+                .ToListAsync();
+
+            return await _context.Transactions
+                .Include(t => t.Category)
+                .Where(t => userAccountIds.Contains(t.AccountId) &&
+                            t.Date >= startDate && t.Date <= endDate &&
+                            t.Category.Type == "Income")
+                .SumAsync(t => t.Amount);
+        }
+
+        /// <summary>
+        /// Асинхронно вычисляет общую сумму расходов пользователя за период.
+        /// </summary>
+        public async Task<decimal> GetTotalExpensesAsync(int userId, DateTime startDate, DateTime endDate)
+        {
+            var userAccountIds = await _context.Accounts
+                .Where(a => a.UserId == userId)
+                .Select(a => a.Id)
+                .ToListAsync();
+
+            return await _context.Transactions
+                .Include(t => t.Category)
+                .Where(t => userAccountIds.Contains(t.AccountId) &&
+                            t.Date >= startDate && t.Date <= endDate &&
+                            t.Category.Type == "Expense")
+                .SumAsync(t => t.Amount);
         }
     }
 }
