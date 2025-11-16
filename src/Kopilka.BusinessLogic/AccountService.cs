@@ -25,9 +25,10 @@ namespace Kopilka.BusinessLogic
         /// <returns>Общий баланс.</returns>
         public async Task<decimal> GetUserBalanceAsync(int userId)
         {
-            return await _context.Accounts
+            var accounts = await _context.Accounts
                 .Where(a => a.UserId == userId)
-                .SumAsync(a => a.Balance);
+                .ToListAsync();
+            return accounts.Sum(a => a.Balance);
         }
 
         /// <summary>
