@@ -49,6 +49,11 @@ namespace Kopilka.BusinessLogic
         /// <returns>Созданный пользователь.</returns>
         public async Task<User> RegisterUserAsync(string login, string password)
         {
+            if (login == password)
+            {
+                throw new System.ArgumentException("Логин и пароль не должны совпадать.");
+            }
+
             var user = new User
             {
                 Login = login,

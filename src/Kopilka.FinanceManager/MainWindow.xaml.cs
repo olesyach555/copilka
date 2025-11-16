@@ -37,8 +37,15 @@ namespace Kopilka.FinanceManager
                 return;
             }
 
-            var newUser = await _userService.RegisterUserAsync(login, password);
-            MessageBox.Show($"Пользователь {newUser.Login} успешно зарегистрирован!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+            try
+            {
+                var newUser = await _userService.RegisterUserAsync(login, password);
+                MessageBox.Show($"Пользователь {newUser.Login} успешно зарегистрирован!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (System.ArgumentException ex)
+            {
+                ShowError(ex.Message);
+            }
         }
 
         private async void LoginButton_Click(object sender, RoutedEventArgs e)
