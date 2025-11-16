@@ -1,64 +1,65 @@
 using Kopilka.DataAccess;
 using Kopilka.Shared;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Kopilka.BusinessLogic
 {
-    /// <summary>
-    /// Сервис для управления пользователями.
-    /// </summary>
     public class UserService
     {
         private readonly KopilkaDbContext _context;
 
-        /// <summary>
-        /// Инициализирует новый экземпляр класса <see cref="UserService"/>.
-        /// </summary>
-        /// <param name="context">Контекст базы данных.</param>
         public UserService(KopilkaDbContext context)
         {
             _context = context;
         }
 
-        /// <summary>
-        /// Асинхронно находит пользователя по его идентификатору.
-        /// </summary>
-        /// <param name="id">Идентификатор пользователя.</param>
-        /// <returns>Найденный пользователь или null, если пользователь не найден.</returns>
-        public async Task<User?> GetUserByIdAsync(int id)
-        {
-            return await _context.Users.FindAsync(id);
-        }
-
-        /// <summary>
-        /// Асинхронно находит пользователя по его логину.
-        /// </summary>
-        /// <param name="login">Логин пользователя.</param>
-        /// <returns>Найденный пользователь или null, если пользователь не найден.</returns>
         public async Task<User?> GetUserByLoginAsync(string login)
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Login == login);
         }
 
-        /// <summary>
-        /// Асинхронно регистрирует нового пользователя.
-        /// </summary>
-        /// <param name="login">Логин нового пользователя.</param>
-        /// <param name="password">Пароль нового пользователя.</param>
-        /// <returns>Созданный пользователь.</returns>
-        public async Task<User> RegisterUserAsync(string login, string password)
+        public async Task<User> RegisterUserAsync(string login, string password, string passwordConfirm)
         {
+            // 1. Проверка на совпадение паролей
+            if (password != passwordConfirm)
+            {
+                throw new ArgumentException("Пароли не совпадают.");
+            }
+
+            // 2. Проверка на совпадение логина и пароля
             if (login == password)
             {
-                throw new System.ArgumentException("Логин и пароль не должны совпадать.");
+                throw new ArgumentException("Логин и пароль не должны совпадать.");
+            }
+
+            // 3. Проверка формата логина (латиница, цифры, _)
+            if (!Regex.IsMatch(login, @"^[a-zA-Z0-9_]+$"))
+            {
+                throw new ArgumentException("Логин может содержать только латинские буквы, цифры и символ подчёркивания.");
+            }
+
+            // 4. Проверка сложности пароля (минимум 8 символов, 1 заглавная, 1 цифра)
+            if (password.Length < 8 || !password.Any(char.IsUpper) || !password.Any(char.IsDigit))
+            {
+                throw new ArgumentException("Пароль должен быть не менее 8 символов и содержать хотя бы одну заглавную букву и одну цифру.");
+            }
+
+            // 5. Проверка на существование пользователя (уже была, но оставляем на всякий случай)
+            var existingUser = await GetUserByLoginAsync(login);
+            if (existingUser != null)
+            {
+                throw new ArgumentException("Пользователь с таким логином уже существует.");
             }
 
             var user = new User
             {
                 Login = login,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
-                Role = "User" // По умолчанию все новые пользователи - обычные пользователи
+                Role = "User"
             };
 
             _context.Users.Add(user);
@@ -66,12 +67,6 @@ namespace Kopilka.BusinessLogic
             return user;
         }
 
-        /// <summary>
-        /// Асинхронно выполняет вход пользователя в систему.
-        /// </summary>
-        /// <param name="login">Логин пользователя.</param>
-        /// <param name="password">Пароль пользователя.</param>
-        /// <returns>Объект пользователя в случае успеха, иначе — null.</returns>
         public async Task<User?> LoginAsync(string login, string password)
         {
             var user = await GetUserByLoginAsync(login);

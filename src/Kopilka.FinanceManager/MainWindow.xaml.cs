@@ -23,23 +23,17 @@ namespace Kopilka.FinanceManager
         {
             var login = LoginTextBox.Text;
             var password = PasswordBox.Password;
+            var passwordConfirm = ConfirmPasswordBox.Password;
 
-            if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(password))
+            if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(password) || string.IsNullOrWhiteSpace(passwordConfirm))
             {
-                ShowError("Пожалуйста, введите логин и пароль.");
-                return;
-            }
-
-            var existingUser = await _userService.GetUserByLoginAsync(login);
-            if (existingUser != null)
-            {
-                ShowError("Пользователь с таким логином уже существует.");
+                ShowError("Пожалуйста, заполните все поля.");
                 return;
             }
 
             try
             {
-                var newUser = await _userService.RegisterUserAsync(login, password);
+                var newUser = await _userService.RegisterUserAsync(login, password, passwordConfirm);
                 MessageBox.Show($"Пользователь {newUser.Login} успешно зарегистрирован!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (System.ArgumentException ex)
