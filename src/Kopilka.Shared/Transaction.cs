@@ -36,5 +36,10 @@ namespace Kopilka.Shared
         /// Комментарий к транзакции.
         /// </summary>
         public string Comment { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Навигационное свойство для связи с категорией.
+        /// </summary>
+        public Category Category { get; set; } = null!;
     }
 }
