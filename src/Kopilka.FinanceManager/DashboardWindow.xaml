@@ -7,7 +7,8 @@
         mc:Ignorable="d"
         Title="Копилка - Главная" Height="720" Width="1280"
         WindowStartupLocation="CenterScreen"
-        Foreground="White">
+        Foreground="White"
+        Closing="DashboardWindow_Closing">
     <Window.Resources>
         <Style TargetType="Button" x:Key="AddButton">
             <Setter Property="Background" Value="#FF6BBE9D"/>

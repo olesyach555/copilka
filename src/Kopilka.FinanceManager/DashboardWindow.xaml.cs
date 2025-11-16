@@ -62,5 +62,10 @@ namespace Kopilka.FinanceManager
         {
             // В будущем здесь можно будет, например, сбрасывать фильтры
         }
+
+        private void DashboardWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
     }
 }
