@@ -78,5 +78,23 @@ namespace Kopilka.BusinessLogic
                 .ToListAsync();
             return transactions.Sum(t => t.Amount);
         }
+
+        /// <summary>
+        /// Асинхронно добавляет новую транзакцию и связанную с ней запись о дате.
+        /// </summary>
+        /// <param name="transaction">Транзакция для добавления.</param>
+        public async Task AddTransactionAsync(Transaction transaction)
+        {
+            _context.Transactions.Add(transaction);
+
+            var date = new Date
+            {
+                DateTime = transaction.Date,
+                OperationType = $"Транзакция: {transaction.Amount} {transaction.Category.Type}"
+            };
+            _context.Dates.Add(date);
+
+            await _context.SaveChangesAsync();
+        }
     }
 }

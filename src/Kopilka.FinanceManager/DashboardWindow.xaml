@@ -59,6 +59,7 @@
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
+                    <Button Content="Фильтр по дате" Click="DateFilterButton_Click" Margin="5,10"/>
                 </StackPanel>
             </Border>
 
@@ -68,14 +69,6 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-
-                <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
-                    <TextBlock Text="Период с:" VerticalAlignment="Center" Margin="5"/>
-                    <DatePicker x:Name="StartDatePicker" Width="120"/>
-                    <TextBlock Text="по:" VerticalAlignment="Center" Margin="10,5,5,5"/>
-                    <DatePicker x:Name="EndDatePicker" Width="120"/>
-                    <Button Content="Применить" Click="ApplyDateFilter_Click" Margin="10,0"/>
-                </StackPanel>
 
                  <TabControl Grid.Row="1" x:Name="MainTabControl" BorderThickness="0" Background="Transparent" SelectionChanged="MainTabControl_SelectionChanged">
                     <TabItem Header="РАСХОДЫ">
@@ -96,7 +89,8 @@
                     </TabItem>
                 </TabControl>
                 <Button Style="{StaticResource AddButton}" Content="+"
-                        HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="30"/>
+                        HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="30"
+                        Click="AddTransactionButton_Click"/>
             </Grid>
         </Grid>
     </Grid>

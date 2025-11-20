@@ -28,6 +28,11 @@ namespace Kopilka.DataAccess
         /// </summary>
         public DbSet<Transaction> Transactions { get; set; }
 
+        /// <summary>
+        /// Набор данных для таблицы "Даты".
+        /// </summary>
+        public DbSet<Date> Dates { get; set; }
+
         public KopilkaDbContext()
         {
         }

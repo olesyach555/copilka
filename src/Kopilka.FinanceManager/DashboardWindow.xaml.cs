@@ -34,28 +34,28 @@ namespace Kopilka.FinanceManager
             AccountsListView.ItemsSource = accounts;
 
             // Устанавливаем период по умолчанию (последняя неделя) и загружаем транзакции
-            EndDatePicker.SelectedDate = DateTime.Now;
-            StartDatePicker.SelectedDate = DateTime.Now.AddDays(-7);
-            await LoadTransactionDataAsync();
+            await LoadTransactionDataAsync(DateTime.Now.AddDays(-7), DateTime.Now);
         }
 
-        private async Task LoadTransactionDataAsync()
+        private async Task LoadTransactionDataAsync(DateTime? startDate, DateTime? endDate)
         {
-            if (StartDatePicker.SelectedDate == null || EndDatePicker.SelectedDate == null) return;
+            if (startDate == null || endDate == null) return;
 
-            var startDate = StartDatePicker.SelectedDate.Value;
-            var endDate = EndDatePicker.SelectedDate.Value;
-
-            var income = await _transactionService.GetTotalIncomeAsync(_currentUser.Id, startDate, endDate);
+            var income = await _transactionService.GetTotalIncomeAsync(_currentUser.Id, startDate.Value, endDate.Value);
             var expenses = await _transactionService.GetTotalExpensesAsync(_currentUser.Id, startDate, endDate);
 
             IncomeTextBlock.Text = $"{income:N2} ₽";
             ExpensesTextBlock.Text = $"{expenses:N2} ₽";
         }
 
-        private async void ApplyDateFilter_Click(object sender, RoutedEventArgs e)
+        private async void DateFilterButton_Click(object sender, RoutedEventArgs e)
         {
-            await LoadTransactionDataAsync();
+            var dateFilterWindow = new DateFilterWindow();
+            dateFilterWindow.Owner = this;
+            if (dateFilterWindow.ShowDialog() == true)
+            {
+                await LoadTransactionDataAsync(dateFilterWindow.StartDate, dateFilterWindow.EndDate);
+            }
         }
 
         private void MainTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -66,6 +66,16 @@ namespace Kopilka.FinanceManager
         private void DashboardWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
         {
             Application.Current.Shutdown();
+        }
+
+        private async void AddTransactionButton_Click(object sender, RoutedEventArgs e)
+        {
+            var addTransactionWindow = new AddTransactionWindow(_currentUser);
+            addTransactionWindow.Owner = this;
+            if (addTransactionWindow.ShowDialog() == true)
+            {
+                await LoadInitialDataAsync();
+            }
         }
     }
 }
