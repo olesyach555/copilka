@@ -23,6 +23,11 @@ namespace Kopilka.Shared
         public int CategoryId { get; set; }
 
         /// <summary>
+        /// Тип транзакции (например, "Доход" или "Расход").
+        /// </summary>
+        public string Type { get; set; } = string.Empty;
+
+        /// <summary>
         /// Сумма транзакции.
         /// </summary>
         public decimal Amount { get; set; }

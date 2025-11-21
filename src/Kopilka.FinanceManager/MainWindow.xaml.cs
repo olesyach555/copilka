@@ -1,96 +1,81 @@
-using System.Windows;
 using Kopilka.BusinessLogic;
 using Kopilka.DataAccess;
+using Kopilka.FinanceManager.Views;
+using Kopilka.Shared;
+using System.Linq;
+using System.Windows;
 
 namespace Kopilka.FinanceManager
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly UserService _userService;
+        private readonly User _currentUser;
+        private readonly TransactionService _transactionService;
         private readonly KopilkaDbContext _dbContext;
 
-        public MainWindow()
+        public MainWindow(User user)
         {
             InitializeComponent();
+            _currentUser = user;
+
             _dbContext = new KopilkaDbContext();
-            _userService = new UserService(_dbContext);
+            _transactionService = new TransactionService(_dbContext);
+
+            LoadUserData();
+            NavigateToHome(); // Начальная навигация
         }
 
-        private async void RegisterButton_Click(object sender, RoutedEventArgs e)
+        private async void LoadUserData()
         {
-            var login = LoginTextBox.Text;
-            var password = PasswordBox.Password;
-            var passwordConfirm = ConfirmPasswordBox.Password;
+            UsernameTextBlock.Text = _currentUser.Login;
+            UserInitialTextBlock.Text = _currentUser.Login.FirstOrDefault().ToString().ToUpper();
 
-            if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(password) || string.IsNullOrWhiteSpace(passwordConfirm))
-            {
-                ShowError("Пожалуйста, заполните все поля.");
-                return;
-            }
-
-            try
-            {
-                var newUser = await _userService.RegisterUserAsync(login, password, passwordConfirm);
-                MessageBox.Show($"Пользователь {newUser.Login} успешно зарегистрирован!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch (System.ArgumentException ex)
-            {
-                ShowError(ex.Message);
-            }
+            var balance = await _transactionService.GetTotalBalanceAsync(_currentUser.Id);
+            BalanceTextBlock.Text = $"Остаток: {balance:C}";
         }
 
-        private async void LoginButton_Click(object sender, RoutedEventArgs e)
+        private async void NavigateToHome()
         {
-            var login = LoginTextBox.Text;
-            var password = PasswordBox.Password;
-
-            if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(password))
-            {
-                ShowError("Пожалуйста, введите логин и пароль.");
-                return;
-            }
-
-            var user = await _userService.LoginAsync(login, password);
-
-            if (user != null)
-            {
-                var dashboard = new DashboardWindow(user);
-                dashboard.Show();
-                this.Close();
-            }
-            else
-            {
-                ShowError("Неверный логин или пароль.");
-            }
+            var transactions = await _transactionService.GetRecentTransactionsAsync(_currentUser.Id, 15);
+            var income = transactions.Where(t => t.Type == "Income").ToList();
+            var expenses = transactions.Where(t => t.Type == "Expense").ToList();
+            MainFrame.Navigate(new HomePage(income, expenses));
         }
 
-        private void ShowError(string message)
+        // --- Обработчики кнопок навигации ---
+        private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
-            ErrorTextBlock.Text = message;
-            ErrorBorder.Visibility = Visibility.Visible;
+            NavigateToHome();
         }
 
-        private void HideError()
+        private void AccountsButton_Click(object sender, RoutedEventArgs e)
         {
-            ErrorBorder.Visibility = Visibility.Collapsed;
+            MainFrame.Navigate(new AccountsPage());
         }
 
-        private void CloseErrorButton_Click(object sender, RoutedEventArgs e)
+        private void ChartsButton_Click(object sender, RoutedEventArgs e)
         {
-            HideError();
+            MainFrame.Navigate(new ChartsPage());
         }
 
-        private void Input_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        private void CategoriesButton_Click(object sender, RoutedEventArgs e)
         {
-            HideError();
+            MainFrame.Navigate(new CategoriesPage());
         }
 
-        private void Password_PasswordChanged(object sender, RoutedEventArgs e)
+        private void RegularPaymentsButton_Click(object sender, RoutedEventArgs e)
         {
-            HideError();
+            MainFrame.Navigate(new RegularPaymentsPage());
+        }
+
+        private void RemindersButton_Click(object sender, RoutedEventArgs e)
+        {
+            MainFrame.Navigate(new RemindersPage());
+        }
+
+        private void SettingsButton_Click(object sender, RoutedEventArgs e)
+        {
+            MainFrame.Navigate(new SettingsPage());
         }
     }
 }
