@@ -14,6 +14,8 @@ namespace Kopilka.FinanceManager
         private readonly AccountService _accountService;
         private readonly TransactionService _transactionService;
         private readonly KopilkaDbContext _dbContext;
+        private DateTime _startDate;
+        private DateTime _endDate;
 
         public DashboardWindow(User user)
         {
@@ -34,15 +36,20 @@ namespace Kopilka.FinanceManager
             AccountsListView.ItemsSource = accounts;
 
             // Устанавливаем период по умолчанию (последняя неделя) и загружаем транзакции
-            await LoadTransactionDataAsync(DateTime.Now.AddDays(-7), DateTime.Now);
+            _startDate = DateTime.Now.AddDays(-7);
+            _endDate = DateTime.Now;
+            await LoadTransactionDataAsync(_startDate, _endDate);
         }
 
         private async Task LoadTransactionDataAsync(DateTime? startDate, DateTime? endDate)
         {
             if (startDate == null || endDate == null) return;
 
-            var income = await _transactionService.GetTotalIncomeAsync(_currentUser.Id, startDate.Value, endDate.Value);
-            var expenses = await _transactionService.GetTotalExpensesAsync(_currentUser.Id, startDate, endDate);
+            _startDate = startDate.Value;
+            _endDate = endDate.Value;
+
+            var income = await _transactionService.GetTotalIncomeAsync(_currentUser.Id, _startDate, _endDate);
+            var expenses = await _transactionService.GetTotalExpensesAsync(_currentUser.Id, _startDate, _endDate);
 
             IncomeTextBlock.Text = $"{income:N2} ₽";
             ExpensesTextBlock.Text = $"{expenses:N2} ₽";
@@ -74,7 +81,7 @@ namespace Kopilka.FinanceManager
             addTransactionWindow.Owner = this;
             if (addTransactionWindow.ShowDialog() == true)
             {
-                await LoadInitialDataAsync();
+                await LoadTransactionDataAsync(_startDate, _endDate);
             }
         }
     }
