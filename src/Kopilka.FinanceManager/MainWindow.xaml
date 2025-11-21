@@ -5,37 +5,73 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Kopilka.FinanceManager"
         mc:Ignorable="d"
-        Title="Kopilka - Вход" Height="450" Width="400"
+        Title="Kopilka Finance Manager" Height="720" Width="1280"
         WindowStartupLocation="CenterScreen">
+
+    <Window.Resources>
+        <Style x:Key="NavButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="Padding" Value="15,10"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="5">
+                            <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#739072"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
     <Grid>
-        <Border CornerRadius="10" BorderBrush="LightGray" BorderThickness="1" Padding="20" Margin="20">
-            <StackPanel VerticalAlignment="Center">
-                <TextBlock Text="Вход в Копилку" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
-                <TextBlock Text="Логин:" Margin="0,0,0,5"/>
-                <TextBox x:Name="LoginTextBox" Padding="5" TextChanged="Input_TextChanged"/>
+        <!-- Левая навигационная панель -->
+        <Border Grid.Column="0" Background="#4F6F52">
+            <StackPanel Margin="10">
 
-                <TextBlock Text="Пароль:" Margin="0,10,0,5"/>
-                <PasswordBox x:Name="PasswordBox" Padding="5" PasswordChanged="Password_PasswordChanged"/>
+                <!-- Информация о пользователе -->
+                <StackPanel Orientation="Horizontal" Margin="10">
+                    <Border CornerRadius="25" Width="50" Height="50" Background="#3A5A40" VerticalAlignment="Center">
+                        <TextBlock x:Name="UserInitialTextBlock" Text="T" FontSize="24" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <StackPanel VerticalAlignment="Center" Margin="10,0,0,0">
+                        <TextBlock x:Name="UsernameTextBlock" Text="testuser" Foreground="White" FontSize="16" FontWeight="Bold"/>
+                        <TextBlock x:Name="BalanceTextBlock" Text="Остаток: 0,00 ₽" Foreground="White" FontSize="14"/>
+                    </StackPanel>
+                </StackPanel>
 
-                <TextBlock Text="Подтвердите пароль:" Margin="0,10,0,5"/>
-                <PasswordBox x:Name="ConfirmPasswordBox" Padding="5" PasswordChanged="Password_PasswordChanged"/>
+                <!-- Разделитель -->
+                <Separator Margin="10" Background="White"/>
 
-                <!-- Панель для вывода ошибок -->
-                <Border x:Name="ErrorBorder" Background="#FFF9EBEB" BorderBrush="#FFED9A9A" BorderThickness="1" CornerRadius="5" Padding="10" Margin="0,10,0,10" Visibility="Collapsed">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock x:Name="ErrorTextBlock" Foreground="#FFD9534F" TextWrapping="Wrap" VerticalAlignment="Center"/>
-                        <Button x:Name="CloseErrorButton" Grid.Column="1" Content="X" FontWeight="Bold" Foreground="#FFD9534F" Background="Transparent" BorderThickness="0" Width="20" Height="20" VerticalAlignment="Top" HorizontalAlignment="Right" Click="CloseErrorButton_Click"/>
-                    </Grid>
-                </Border>
+                <!-- Кнопки навигации -->
+                <Button x:Name="HomeButton" Content="Главная" Style="{StaticResource NavButtonStyle}" Click="HomeButton_Click"/>
+                <Button x:Name="AccountsButton" Content="Счета" Style="{StaticResource NavButtonStyle}" Click="AccountsButton_Click"/>
+                <Button x:Name="ChartsButton" Content="Графики" Style="{StaticResource NavButtonStyle}" Click="ChartsButton_Click"/>
+                <Button x:Name="CategoriesButton" Content="Категории" Style="{StaticResource NavButtonStyle}" Click="CategoriesButton_Click"/>
+                <Button x:Name="RegularPaymentsButton" Content="Регулярные платежи" Style="{StaticResource NavButtonStyle}" Click="RegularPaymentsButton_Click"/>
+                <Button x:Name="RemindersButton" Content="Напоминания" Style="{StaticResource NavButtonStyle}" Click="RemindersButton_Click"/>
+                <Button x:Name="SettingsButton" Content="Настройки" Style="{StaticResource NavButtonStyle}" Click="SettingsButton_Click"/>
 
-                <Button x:Name="LoginButton" Content="Войти" Padding="10" Margin="0,10,0,0" Click="LoginButton_Click"/>
-                <Button x:Name="RegisterButton" Content="Регистрация" Padding="10" Margin="0,10,0,0" Click="RegisterButton_Click"/>
             </StackPanel>
         </Border>
+
+        <!-- Основная область контента -->
+        <Frame x:Name="MainFrame" Grid.Column="1" NavigationUIVisibility="Hidden"/>
+
     </Grid>
 </Window>

@@ -96,5 +96,54 @@ namespace Kopilka.BusinessLogic
 
             await _context.SaveChangesAsync();
         }
+
+        /// <summary>
+        /// Асинхронно вычисляет общий баланс для пользователя на основе всех его транзакций.
+        /// </summary>
+        /// <param name="userId">ID пользователя.</param>
+        /// <returns>Общий баланс.</returns>
+        public async Task<decimal> GetTotalBalanceAsync(int userId)
+        {
+            var userAccountIds = await _context.Accounts
+                .Where(a => a.UserId == userId)
+                .Select(a => a.Id)
+                .ToListAsync();
+
+            if (!userAccountIds.Any())
+            {
+                return 0;
+            }
+
+            var totalIncome = await _context.Transactions
+                .Where(t => userAccountIds.Contains(t.AccountId) && t.Type == "Income")
+                .SumAsync(t => t.Amount);
+
+            var totalExpenses = await _context.Transactions
+                .Where(t => userAccountIds.Contains(t.AccountId) && t.Type == "Expense")
+                .SumAsync(t => t.Amount);
+
+            return totalIncome - totalExpenses;
+        }
+
+        /// <summary>
+        /// Асинхронно получает список последних транзакций пользователя.
+        /// </summary>
+        /// <param name="userId">ID пользователя.</param>
+        /// <param name="count">Количество транзакций для получения.</param>
+        /// <returns>Список последних транзакций.</returns>
+        public async Task<List<Transaction>> GetRecentTransactionsAsync(int userId, int count)
+        {
+            var userAccountIds = await _context.Accounts
+                .Where(a => a.UserId == userId)
+                .Select(a => a.Id)
+                .ToListAsync();
+
+            return await _context.Transactions
+                .Where(t => userAccountIds.Contains(t.AccountId))
+                .OrderByDescending(t => t.Date)
+                .Take(count)
+                .Include(t => t.Category)
+                .ToListAsync();
+        }
     }
 }
