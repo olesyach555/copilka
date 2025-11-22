@@ -24,5 +24,15 @@ namespace Kopilka.Shared
         /// Описание категории.
         /// </summary>
         public string Description { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Идентификатор пользователя, которому принадлежит категория.
+        /// </summary>
+        public int UserId { get; set; }
+
+        /// <summary>
+        /// Пользователь, которому принадлежит категория.
+        /// </summary>
+        public User User { get; set; } = null!;
     }
 }

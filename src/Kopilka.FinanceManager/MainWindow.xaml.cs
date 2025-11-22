@@ -39,7 +39,10 @@ namespace Kopilka.FinanceManager
         private async void LoadUserData()
         {
             UsernameTextBlock.Text = _currentUser.Login;
-            UserInitialTextBlock.Text = _currentUser.Login.FirstOrDefault()?.ToString().ToUpper();
+            if (!string.IsNullOrEmpty(_currentUser.Login))
+            {
+                UserInitialTextBlock.Text = _currentUser.Login[0].ToString().ToUpper();
+            }
 
             var balance = await _transactionService.GetTotalBalanceAsync(_currentUser.Id);
             BalanceTextBlock.Text = $"Остаток: {balance:C}";
