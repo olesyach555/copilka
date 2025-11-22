@@ -1,5 +1,6 @@
 using Kopilka.BusinessLogic;
 using Kopilka.DataAccess;
+using Microsoft.EntityFrameworkCore;
 using System.Windows;
 
 namespace Kopilka.FinanceManager

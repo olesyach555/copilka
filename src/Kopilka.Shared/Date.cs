@@ -23,6 +23,6 @@ namespace Kopilka.Shared
         /// <remarks>
         /// Например: "расход", "доход", "перевод со счета X на счет Y".
         /// </remarks>
-        public string OperationType { get; set; }
+        public string OperationType { get; set; } = string.Empty;
     }
 }
