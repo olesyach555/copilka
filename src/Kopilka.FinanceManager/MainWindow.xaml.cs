@@ -1,6 +1,7 @@
 using Kopilka.BusinessLogic;
 using Kopilka.DataAccess;
 using Kopilka.FinanceManager.Views;
+using Kopilka.FinanceManager.Views.Pages; // Добавляем using для страниц
 using Kopilka.Shared;
 using System.Linq;
 using System.Windows;
@@ -33,7 +34,8 @@ namespace Kopilka.FinanceManager
 
 
             LoadUserData();
-            NavigateToHome();
+            // Изменяем вызов на загрузку страницы счетов по умолчанию
+            NavigateToAccounts();
         }
 
         private async void LoadUserData()
@@ -56,9 +58,15 @@ namespace Kopilka.FinanceManager
             MainFrame.Navigate(new HomePage(income, expenses));
         }
 
+        private void NavigateToAccounts()
+        {
+            // Создаем и загружаем страницу счетов, передавая ей DbContext и пользователя
+            MainFrame.Navigate(new AccountsPage(_dbContext, _currentUser));
+        }
+
         // --- Обработчики кнопок навигации ---
         private void HomeButton_Click(object sender, RoutedEventArgs e) => NavigateToHome();
-        private void AccountsButton_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new AccountsPage(_currentUser, _accountService));
+        private void AccountsButton_Click(object sender, RoutedEventArgs e) => NavigateToAccounts(); // Исправляем вызов
         private void ChartsButton_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ChartsPage());
         private void CategoriesButton_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new CategoriesPage(_currentUser, _categoryService));
         private void RegularPaymentsButton_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new RegularPaymentsPage());

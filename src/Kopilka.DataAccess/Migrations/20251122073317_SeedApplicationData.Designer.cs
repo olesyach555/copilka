@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Kopilka.DataAccess.Migrations
 {
     [DbContext(typeof(KopilkaDbContext))]
-    [Migration("20251121202842_AddTestData")]
-    partial class AddTestData
+    [Migration("20251122073317_SeedApplicationData")]
+    partial class SeedApplicationData
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -67,7 +67,12 @@ namespace Kopilka.DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Categories");
                 });
@@ -129,6 +134,9 @@ namespace Kopilka.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Email")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Login")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -144,6 +152,17 @@ namespace Kopilka.DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("Kopilka.Shared.Category", b =>
+                {
+                    b.HasOne("Kopilka.Shared.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Kopilka.Shared.Transaction", b =>
