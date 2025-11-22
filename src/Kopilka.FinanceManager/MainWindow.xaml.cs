@@ -60,8 +60,8 @@ namespace Kopilka.FinanceManager
 
         private void NavigateToAccounts()
         {
-            // Создаем и загружаем страницу счетов, передавая ей DbContext и пользователя
-            MainFrame.Navigate(new AccountsPage(_dbContext, _currentUser));
+            // Указываем полный путь, чтобы избежать неоднозначности
+            MainFrame.Navigate(new Kopilka.FinanceManager.Views.Pages.AccountsPage(_dbContext, _currentUser));
         }
 
         // --- Обработчики кнопок навигации ---
