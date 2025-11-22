@@ -45,7 +45,7 @@ namespace Kopilka.DataAccess
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlite("Data Source=Kopilka.db");
+                optionsBuilder.UseSqlServer("Server=U411-S7A\\SQLEXPRESS411S7A;Database=KopilkaDB;Trusted_Connection=True;TrustServerCertificate=True;");
             }
         }
 
