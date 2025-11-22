@@ -24,5 +24,10 @@ namespace Kopilka.Shared
         /// Роль пользователя в системе (например, "Admin" или "User").
         /// </summary>
         public string Role { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Электронная почта пользователя.
+        /// </summary>
+        public string? Email { get; set; }
     }
 }

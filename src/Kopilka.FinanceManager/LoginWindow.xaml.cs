@@ -1,96 +1,66 @@
-using System.Windows;
 using Kopilka.BusinessLogic;
 using Kopilka.DataAccess;
+using Kopilka.Shared;
+using System;
+using System.Windows;
 
 namespace Kopilka.FinanceManager
 {
-    /// <summary>
-    /// Interaction logic for LoginWindow.xaml
-    /// </summary>
     public partial class LoginWindow : Window
     {
-        private readonly UserService _userService;
-        private readonly KopilkaDbContext _dbContext;
+        private readonly AuthService _authService;
 
-        public LoginWindow()
+        public LoginWindow(AuthService authService)
         {
             InitializeComponent();
-            _dbContext = new KopilkaDbContext();
-            _userService = new UserService(_dbContext);
+            _authService = authService;
+        }
+
+        private async void LoginButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var user = await _authService.LoginAsync(LoginTextBox.Text, PasswordBox.Password);
+                if (user != null)
+                {
+                    var dbContext = new KopilkaDbContext();
+                    var mainWindow = new MainWindow(user, dbContext);
+                    mainWindow.Show();
+                    Close();
+                }
+                else
+                {
+                    MessageBox.Show("Неверный логин или пароль.", "Ошибка входа", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Произошла непредвиденная ошибка: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private async void RegisterButton_Click(object sender, RoutedEventArgs e)
         {
-            var login = LoginTextBox.Text;
-            var password = PasswordBox.Password;
-            var passwordConfirm = ConfirmPasswordBox.Password;
-
-            if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(password) || string.IsNullOrWhiteSpace(passwordConfirm))
+            if (PasswordBox.Password != ConfirmPasswordBox.Password)
             {
-                ShowError("Пожалуйста, заполните все поля.");
+                MessageBox.Show("Пароли не совпадают.", "Ошибка регистрации", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
             try
             {
-                var newUser = await _userService.RegisterUserAsync(login, password, passwordConfirm);
-                MessageBox.Show($"Пользователь {newUser.Login} успешно зарегистрирован!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                var user = await _authService.RegisterUserAsync(LoginTextBox.Text, PasswordBox.Password);
+                MessageBox.Show($"Пользователь {user.Login} успешно зарегистрирован!", "Регистрация успешна", MessageBoxButton.OK, MessageBoxImage.Information);
             }
-            catch (System.ArgumentException ex)
+            catch (Exception ex) // Отлавливаем ошибки валидации
             {
-                ShowError(ex.Message);
+                MessageBox.Show(ex.Message, "Ошибка регистрации", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private async void LoginButton_Click(object sender, RoutedEventArgs e)
-        {
-            var login = LoginTextBox.Text;
-            var password = PasswordBox.Password;
-
-            if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(password))
-            {
-                ShowError("Пожалуйста, введите логин и пароль.");
-                return;
-            }
-
-            var user = await _userService.LoginAsync(login, password);
-
-            if (user != null)
-            {
-                var mainWindow = new MainWindow(user);
-                mainWindow.Show();
-                this.Close();
-            }
-            else
-            {
-                ShowError("Неверный логин или пароль.");
-            }
-        }
-
-        private void ShowError(string message)
-        {
-            ErrorTextBlock.Text = message;
-            ErrorBorder.Visibility = Visibility.Visible;
-        }
-
-        private void HideError()
-        {
-            ErrorBorder.Visibility = Visibility.Collapsed;
-        }
-
-        private void CloseErrorButton_Click(object sender, RoutedEventArgs e)
-        {
-            HideError();
-        }
-
-        private void Input_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-            HideError();
-        }
-
-        private void Password_PasswordChanged(object sender, RoutedEventArgs e)
-        {
-            HideError();
-        }
+        // Пустые обработчики для совместимости с XAML
+        private void Input_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e) { }
+        private void Password_PasswordChanged(object sender, RoutedEventArgs e) { }
+        private void CloseErrorButton_Click(object sender, RoutedEventArgs e) { }
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Kopilka.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Kopilka.DataAccess.Migrations
 {
     [DbContext(typeof(KopilkaDbContext))]
-    partial class KopilkaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251122040417_AddEmailToUser")]
+    partial class AddEmailToUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.6");
