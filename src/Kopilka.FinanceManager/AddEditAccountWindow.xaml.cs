@@ -31,7 +31,8 @@ namespace Kopilka.FinanceManager
             WindowTitle.Text = "Редактировать счет";
             AccountNameTextBox.Text = _accountToEdit.Name;
             AccountBalanceTextBox.Text = _accountToEdit.Balance.ToString();
-            AccountBalanceTextBox.IsEnabled = false; // Запрещаем редактировать баланс напрямую
+            // Включаем редактирование баланса согласно новым требованиям
+            AccountBalanceTextBox.IsEnabled = true;
         }
 
         private async void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -42,9 +43,10 @@ namespace Kopilka.FinanceManager
                 return;
             }
 
-            if (!decimal.TryParse(AccountBalanceTextBox.Text, out decimal balance))
+            // Используем CultureInfo.InvariantCulture для корректного парсинга
+            if (!decimal.TryParse(AccountBalanceTextBox.Text, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out decimal balance))
             {
-                MessageBox.Show("Некорректный формат баланса.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Некорректный формат баланса. Используйте точку в качестве десятичного разделителя.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
@@ -54,14 +56,17 @@ namespace Kopilka.FinanceManager
                 {
                     UserId = _userId,
                     Name = AccountNameTextBox.Text,
-                    Balance = balance
+                    Balance = balance,
+                    Type = "Карта", // Устанавливаем значение по умолчанию
+                    Currency = "RUB"   // Устанавливаем значение по умолчанию
                 };
                 await _accountService.AddAccountAsync(newAccount);
             }
             else // Режим редактирования
             {
                 _accountToEdit.Name = AccountNameTextBox.Text;
-                // Баланс не меняем напрямую, он должен меняться через транзакции
+                // Разрешаем прямое изменение баланса
+                _accountToEdit.Balance = balance;
                 await _accountService.UpdateAccountAsync(_accountToEdit);
             }
 
