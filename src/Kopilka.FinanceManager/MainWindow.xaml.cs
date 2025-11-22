@@ -10,25 +10,36 @@ namespace Kopilka.FinanceManager
     public partial class MainWindow : Window
     {
         private readonly User _currentUser;
-        private readonly TransactionService _transactionService;
         private readonly KopilkaDbContext _dbContext;
+        private readonly TransactionService _transactionService;
+        private readonly AccountService _accountService;
+        private readonly CategoryService _categoryService;
+        private readonly UserService _userService;
+        private readonly AuthService _authService;
 
-        public MainWindow(User user)
+
+        public MainWindow(User user, KopilkaDbContext dbContext)
         {
             InitializeComponent();
             _currentUser = user;
+            _dbContext = dbContext;
 
-            _dbContext = new KopilkaDbContext();
+            // Инициализируем все сервисы с единым DbContext
             _transactionService = new TransactionService(_dbContext);
+            _accountService = new AccountService(_dbContext);
+            _categoryService = new CategoryService(_dbContext);
+            _userService = new UserService(_dbContext);
+            _authService = new AuthService(_dbContext);
+
 
             LoadUserData();
-            NavigateToHome(); // Начальная навигация
+            NavigateToHome();
         }
 
         private async void LoadUserData()
         {
             UsernameTextBlock.Text = _currentUser.Login;
-            UserInitialTextBlock.Text = _currentUser.Login.FirstOrDefault().ToString().ToUpper();
+            UserInitialTextBlock.Text = _currentUser.Login.FirstOrDefault()?.ToString().ToUpper();
 
             var balance = await _transactionService.GetTotalBalanceAsync(_currentUser.Id);
             BalanceTextBlock.Text = $"Остаток: {balance:C}";
@@ -43,39 +54,12 @@ namespace Kopilka.FinanceManager
         }
 
         // --- Обработчики кнопок навигации ---
-        private void HomeButton_Click(object sender, RoutedEventArgs e)
-        {
-            NavigateToHome();
-        }
-
-        private void AccountsButton_Click(object sender, RoutedEventArgs e)
-        {
-            MainFrame.Navigate(new AccountsPage());
-        }
-
-        private void ChartsButton_Click(object sender, RoutedEventArgs e)
-        {
-            MainFrame.Navigate(new ChartsPage());
-        }
-
-        private void CategoriesButton_Click(object sender, RoutedEventArgs e)
-        {
-            MainFrame.Navigate(new CategoriesPage());
-        }
-
-        private void RegularPaymentsButton_Click(object sender, RoutedEventArgs e)
-        {
-            MainFrame.Navigate(new RegularPaymentsPage());
-        }
-
-        private void RemindersButton_Click(object sender, RoutedEventArgs e)
-        {
-            MainFrame.Navigate(new RemindersPage());
-        }
-
-        private void SettingsButton_Click(object sender, RoutedEventArgs e)
-        {
-            MainFrame.Navigate(new SettingsPage());
-        }
+        private void HomeButton_Click(object sender, RoutedEventArgs e) => NavigateToHome();
+        private void AccountsButton_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new AccountsPage(_currentUser, _accountService));
+        private void ChartsButton_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ChartsPage());
+        private void CategoriesButton_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new CategoriesPage(_currentUser, _categoryService));
+        private void RegularPaymentsButton_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new RegularPaymentsPage());
+        private void RemindersButton_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new RemindersPage());
+        private void SettingsButton_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new SettingsPage(_currentUser, _userService, _authService));
     }
 }

@@ -1,20 +1,26 @@
+using Kopilka.BusinessLogic;
 using Kopilka.DataAccess;
-using Microsoft.EntityFrameworkCore;
 using System.Windows;
 
 namespace Kopilka.FinanceManager
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
     public partial class App : Application
     {
-        protected override async void OnStartup(StartupEventArgs e)
+        private KopilkaDbContext _dbContext;
+        private AuthService _authService;
+
+        protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
-            await using var context = new KopilkaDbContext();
-            await context.Database.MigrateAsync();
+            _dbContext = new KopilkaDbContext();
+            // Применяем все ожидающие миграции при запуске
+            _dbContext.Database.Migrate();
+
+            _authService = new AuthService(_dbContext);
+
+            var loginWindow = new LoginWindow(_authService);
+            loginWindow.Show();
         }
     }
 }
