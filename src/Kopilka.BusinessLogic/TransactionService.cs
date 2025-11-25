@@ -116,13 +116,13 @@ namespace Kopilka.BusinessLogic
 
             var totalIncome = await _context.Transactions
                 .Where(t => userAccountIds.Contains(t.AccountId) && t.Type == "Income")
-                .SumAsync(t => t.Amount);
+                .SumAsync(t => (double)t.Amount);
 
             var totalExpenses = await _context.Transactions
                 .Where(t => userAccountIds.Contains(t.AccountId) && t.Type == "Expense")
-                .SumAsync(t => t.Amount);
+                .SumAsync(t => (double)t.Amount);
 
-            return totalIncome - totalExpenses;
+            return (decimal)(totalIncome - totalExpenses);
         }
 
         /// <summary>
@@ -143,6 +143,7 @@ namespace Kopilka.BusinessLogic
                 .OrderByDescending(t => t.Date)
                 .Take(count)
                 .Include(t => t.Category)
+                .Include(t => t.Account)
                 .ToListAsync();
         }
     }

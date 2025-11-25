@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Kopilka.DataAccess.Migrations
 {
     [DbContext(typeof(KopilkaDbContext))]
-    [Migration("20251122080348_AddTypeColumnToTransactions")]
-    partial class AddTypeColumnToTransactions
+    [Migration("20251125084858_AddUserIdToTransactionAndSeedData")]
+    partial class AddUserIdToTransactionAndSeedData
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
