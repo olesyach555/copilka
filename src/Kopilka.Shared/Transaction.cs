@@ -46,5 +46,10 @@ namespace Kopilka.Shared
         /// Навигационное свойство для связи с категорией.
         /// </summary>
         public Category Category { get; set; } = null!;
+
+        /// <summary>
+        /// Навигационное свойство для связи со счетом.
+        /// </summary>
+        public Account Account { get; set; } = null!;
     }
 }
