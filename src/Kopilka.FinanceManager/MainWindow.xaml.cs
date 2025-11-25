@@ -1,7 +1,7 @@
 using Kopilka.BusinessLogic;
 using Kopilka.DataAccess;
 using Kopilka.FinanceManager.Views;
-using Kopilka.FinanceManager.Views.Pages; // Добавляем using для страниц
+using Kopilka.FinanceManager.Views.Pages;
 using Kopilka.Shared;
 using System.Linq;
 using System.Windows;
@@ -18,24 +18,20 @@ namespace Kopilka.FinanceManager
         private readonly UserService _userService;
         private readonly AuthService _authService;
 
-
         public MainWindow(User user, KopilkaDbContext dbContext)
         {
             InitializeComponent();
             _currentUser = user;
             _dbContext = dbContext;
 
-            // Инициализируем все сервисы с единым DbContext
             _transactionService = new TransactionService(_dbContext);
             _accountService = new AccountService(_dbContext);
             _categoryService = new CategoryService(_dbContext);
             _userService = new UserService(_dbContext);
             _authService = new AuthService(_dbContext);
 
-
             LoadUserData();
-            // Изменяем вызов на загрузку страницы счетов по умолчанию
-            NavigateToAccounts();
+            NavigateToHome();
         }
 
         private async void LoadUserData()
@@ -60,13 +56,11 @@ namespace Kopilka.FinanceManager
 
         private void NavigateToAccounts()
         {
-            // Указываем полный путь, чтобы избежать неоднозначности
             MainFrame.Navigate(new Kopilka.FinanceManager.Views.Pages.AccountsPage(_dbContext, _currentUser));
         }
 
-        // --- Обработчики кнопок навигации ---
         private void HomeButton_Click(object sender, RoutedEventArgs e) => NavigateToHome();
-        private void AccountsButton_Click(object sender, RoutedEventArgs e) => NavigateToAccounts(); // Исправляем вызов
+        private void AccountsButton_Click(object sender, RoutedEventArgs e) => NavigateToAccounts();
         private void ChartsButton_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ChartsPage());
         private void CategoriesButton_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new CategoriesPage(_currentUser, _categoryService));
         private void RegularPaymentsButton_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new RegularPaymentsPage());
