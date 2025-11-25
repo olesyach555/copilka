@@ -143,6 +143,7 @@ namespace Kopilka.BusinessLogic
                 .OrderByDescending(t => t.Date)
                 .Take(count)
                 .Include(t => t.Category)
+                .Include(t => t.Account)
                 .ToListAsync();
         }
     }

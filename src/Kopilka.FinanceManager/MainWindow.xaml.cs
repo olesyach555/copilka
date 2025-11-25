@@ -35,7 +35,7 @@ namespace Kopilka.FinanceManager
 
             LoadUserData();
             // Изменяем вызов на загрузку страницы счетов по умолчанию
-            NavigateToAccounts();
+            NavigateToHome();
         }
 
         private async void LoadUserData()
@@ -48,6 +48,14 @@ namespace Kopilka.FinanceManager
 
             var balance = await _transactionService.GetTotalBalanceAsync(_currentUser.Id);
             BalanceTextBlock.Text = $"Остаток: {balance:C}";
+        }
+
+        private async void NavigateToHome()
+        {
+            var transactions = await _transactionService.GetRecentTransactionsAsync(_currentUser.Id, 15);
+            var income = transactions.Where(t => t.Type == "Income").ToList();
+            var expenses = transactions.Where(t => t.Type == "Expense").ToList();
+            MainFrame.Navigate(new HomePage(income, expenses));
         }
 
         private async void NavigateToHome()
