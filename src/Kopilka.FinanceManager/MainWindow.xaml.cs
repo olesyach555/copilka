@@ -35,7 +35,7 @@ namespace Kopilka.FinanceManager
 
             LoadUserData();
             // Изменяем вызов на загрузку страницы счетов по умолчанию
-            NavigateToAccounts();
+            NavigateToHome();
         }
 
         private async void LoadUserData()
