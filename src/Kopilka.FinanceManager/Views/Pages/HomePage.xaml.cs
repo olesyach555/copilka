@@ -1,18 +1,55 @@
+using Kopilka.BusinessLogic;
+using Kopilka.DataAccess;
 using Kopilka.Shared;
-using System.Collections.Generic;
+using System;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace Kopilka.FinanceManager.Views.Pages
 {
+    /// <summary>
+    /// Логика взаимодействия для HomePage.xaml
+    /// </summary>
     public partial class HomePage : Page
     {
-        public HomePage(List<Transaction> income, List<Transaction> expenses)
+        private readonly User _currentUser;
+
+        public HomePage(User currentUser)
         {
             InitializeComponent();
-            var allTransactions = new List<Transaction>();
-            allTransactions.AddRange(income);
-            allTransactions.AddRange(expenses);
-            TransactionsListView.ItemsSource = allTransactions;
+            _currentUser = currentUser;
+            Loaded += HomePage_Loaded;
+        }
+
+        private async void HomePage_Loaded(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // DbContext создается для каждой операции и автоматически освобождается
+                using (var dbContext = new KopilkaDbContext())
+                {
+                    var transactionService = new TransactionService(dbContext);
+                    var transactions = await transactionService.GetRecentTransactionsAsync(_currentUser.Id, 15);
+                    TransactionsListView.ItemsSource = transactions;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Произошла ошибка при загрузке транзакций: {ex.Message}",
+                                "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void AddTransactionButton_Click(object sender, RoutedEventArgs e)
+        {
+            // AddTransactionWindow управляет своим собственным DbContext, что является правильным
+            var addTransactionWindow = new AddTransactionWindow(_currentUser);
+            if (addTransactionWindow.ShowDialog() == true)
+            {
+                // Если транзакция была успешно добавлена, обновляем список,
+                // вызывая перезагрузку данных с новым DbContext.
+                HomePage_Loaded(this, new RoutedEventArgs());
+            }
         }
     }
 }

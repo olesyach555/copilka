@@ -84,11 +84,12 @@ namespace Kopilka.FinanceManager
                 var transaction = new Transaction
                 {
                     Amount = amount,
-                    CategoryId = _selectedCategory.Id,
-                    Category = _selectedCategory,
-                    AccountId = account.Id,
+                    Type = _selectedCategory.Type,
                     Date = date,
-                    Comment = CommentTextBox.Text
+                    Comment = CommentTextBox.Text,
+                    AccountId = account.Id,
+                    CategoryId = _selectedCategory.Id,
+                    UserId = _currentUser.Id
                 };
 
                 await _transactionService.AddTransactionAsync(transaction);

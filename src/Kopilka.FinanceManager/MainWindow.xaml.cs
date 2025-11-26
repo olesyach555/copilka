@@ -46,22 +46,10 @@ namespace Kopilka.FinanceManager
             BalanceTextBlock.Text = $"Остаток: {balance:C}";
         }
 
-        private async void NavigateToHome()
+        private void NavigateToHome()
         {
-            var transactions = await _transactionService.GetRecentTransactionsAsync(_currentUser.Id, 15);
-
-            // Если пользователь 'testuser' и у него нет транзакций, показать WelcomePage.
-            if (_currentUser.Login == "testuser" && !transactions.Any())
-            {
-                MainFrame.Navigate(new WelcomePage());
-            }
-            else
-            {
-                // В противном случае, показать обычную HomePage с транзакциями.
-                var income = transactions.Where(t => t.Type == "Income").ToList();
-                var expenses = transactions.Where(t => t.Type == "Expense").ToList();
-                MainFrame.Navigate(new HomePage(income, expenses));
-            }
+            // Теперь HomePage сам загружает свои данные, достаточно передать пользователя.
+            MainFrame.Navigate(new HomePage(_currentUser));
         }
 
         private void NavigateToAccounts()
