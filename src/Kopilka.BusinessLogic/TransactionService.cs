@@ -85,6 +85,13 @@ namespace Kopilka.BusinessLogic
         /// <param name="transaction">Транзакция для добавления.</param>
         public async Task AddTransactionAsync(Transaction transaction)
         {
+            var account = await _context.Accounts.FindAsync(transaction.AccountId);
+            if (account == null)
+            {
+                throw new ArgumentException("Указанный счет не существует.", nameof(transaction.AccountId));
+            }
+
+            transaction.UserId = account.UserId;
             _context.Transactions.Add(transaction);
 
             var date = new Date
