@@ -120,6 +120,8 @@ namespace Kopilka.DataAccess.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AccountId");
+
                     b.HasIndex("CategoryId");
 
                     b.ToTable("Transactions");
@@ -164,11 +166,19 @@ namespace Kopilka.DataAccess.Migrations
 
             modelBuilder.Entity("Kopilka.Shared.Transaction", b =>
                 {
+                    b.HasOne("Kopilka.Shared.Account", "Account")
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Kopilka.Shared.Category", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Account");
 
                     b.Navigation("Category");
                 });
