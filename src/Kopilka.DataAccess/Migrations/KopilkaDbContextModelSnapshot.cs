@@ -43,7 +43,7 @@ namespace Kopilka.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Accounts");
+                    b.ToTable("Accounts", (string)null);
                 });
 
             modelBuilder.Entity("Kopilka.Shared.Category", b =>
@@ -71,7 +71,7 @@ namespace Kopilka.DataAccess.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("Kopilka.Shared.Date", b =>
@@ -89,7 +89,7 @@ namespace Kopilka.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Dates");
+                    b.ToTable("Dates", (string)null);
                 });
 
             modelBuilder.Entity("Kopilka.Shared.Transaction", b =>
@@ -124,7 +124,7 @@ namespace Kopilka.DataAccess.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Transactions");
+                    b.ToTable("Transactions", (string)null);
                 });
 
             modelBuilder.Entity("Kopilka.Shared.User", b =>
@@ -150,7 +150,7 @@ namespace Kopilka.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("Kopilka.Shared.Category", b =>
