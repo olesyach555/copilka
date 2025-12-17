@@ -37,12 +37,12 @@
 
         <!-- Кнопки быстрых действий -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
-            <Button x:Name="AddIncomeButton" Content="+ Доход" Width="120" Height="60" Margin="0,0,10,0" Background="{StaticResource AccentBrush}" Foreground="{StaticResource PrimaryTextBrush}" Click="AddIncomeButton_Click">
+            <Button x:Name="AddIncomeButton" Content="+ Доход" Width="120" Height="60" Margin="0,0,10,0" Click="AddIncomeButton_Click">
                 <Button.ToolTip>
                     <ToolTip Content="Добавить новую операцию дохода."/>
                 </Button.ToolTip>
             </Button>
-            <Button x:Name="AddExpenseButton" Content="- Расход" Width="120" Height="60" Margin="10,0,0,0" Background="{StaticResource SecondaryAccentBrush}" Foreground="{StaticResource PrimaryTextBrush}" Click="AddExpenseButton_Click">
+            <Button x:Name="AddExpenseButton" Content="- Расход" Width="120" Height="60" Margin="10,0,0,0" Background="{StaticResource SecondaryAccentBrush}" Click="AddExpenseButton_Click">
                  <Button.ToolTip>
                     <ToolTip Content="Добавить новую операцию расхода."/>
                 </Button.ToolTip>

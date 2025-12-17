@@ -52,9 +52,9 @@ namespace Kopilka.FinanceManager.Views.Pages
 
         private async System.Threading.Tasks.Task UpdateTotalBalanceAsync(KopilkaDbContext dbContext)
         {
-            var totalBalance = await dbContext.Accounts
+            var totalBalance = (decimal)await dbContext.Accounts
                                               .Where(a => a.UserId == _currentUser.Id)
-                                              .SumAsync(a => a.Balance);
+                                              .SumAsync(a => (double)a.Balance);
             TotalBalanceTextBlock.Text = $"{totalBalance:N2} ₽";
         }
 
