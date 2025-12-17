@@ -4,9 +4,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Управление счетом" Height="400" Width="300"
+        Title="Управление счетом" Height="400" Width="400"
         WindowStartupLocation="CenterOwner"
-        Background="#1E1E1E">
+        Background="{StaticResource MainBackgroundBrush}">
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -14,16 +14,19 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" x:Name="WindowTitle" Text="Добавить счет" FontSize="24" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+        <TextBlock Grid.Row="0" x:Name="WindowTitle" Text="Добавить счет"
+                   Style="{StaticResource TitleTextStyle}"
+                   HorizontalAlignment="Center" Margin="0,0,0,20"/>
 
         <StackPanel Grid.Row="1" VerticalAlignment="Center">
-            <TextBlock Text="Имя счета" Foreground="Gray" Margin="0,0,0,5"/>
-            <TextBox x:Name="AccountNameTextBox" FontSize="18" Padding="5"/>
+            <TextBlock Text="Имя счета" Style="{StaticResource SecondaryTextStyle}" Margin="0,0,0,5"/>
+            <TextBox x:Name="AccountNameTextBox" Style="{StaticResource StyledTextBoxStyle}"/>
 
-            <TextBlock Text="Начальный баланс" Foreground="Gray" Margin="0,20,0,5"/>
-            <TextBox x:Name="AccountBalanceTextBox" FontSize="18" Padding="5" Text="0"/>
+            <TextBlock Text="Начальный баланс" Style="{StaticResource SecondaryTextStyle}" Margin="0,20,0,5"/>
+            <TextBox x:Name="AccountBalanceTextBox" Style="{StaticResource StyledTextBoxStyle}" Text="0"/>
         </StackPanel>
 
-        <Button Grid.Row="2" x:Name="SaveButton" Content="Сохранить" Click="SaveButton_Click" FontSize="18" Padding="10"/>
+        <Button Grid.Row="2" x:Name="SaveButton" Content="Сохранить" Click="SaveButton_Click"
+                Style="{StaticResource AccentButtonStyle}"/>
     </Grid>
 </Window>

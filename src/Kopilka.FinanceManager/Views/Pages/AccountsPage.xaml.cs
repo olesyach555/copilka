@@ -1,9 +1,8 @@
-using Kopilka.BusinessLogic;
-using Kopilka.DataAccess;
-using Kopilka.Shared;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using Kopilka.BusinessLogic;
+using Kopilka.BusinessLogic.ViewModels;
+using Kopilka.DataAccess;
 
 namespace Kopilka.FinanceManager.Views.Pages
 {
@@ -12,58 +11,32 @@ namespace Kopilka.FinanceManager.Views.Pages
     /// </summary>
     public partial class AccountsPage : Page
     {
-        private readonly KopilkaDbContext _context;
-        private readonly User _currentUser;
-        private readonly AccountService _accountService;
+        private readonly AccountsViewModel _viewModel;
 
-        public AccountsPage(KopilkaDbContext context, User currentUser)
+        public AccountsPage(AccountsViewModel viewModel)
         {
             InitializeComponent();
-            _context = context;
-            _currentUser = currentUser;
-            _accountService = new AccountService(_context); // Инициализируем сервис
+            _viewModel = viewModel;
+            DataContext = _viewModel;
 
-            LoadAccounts();
+            // Подписываемся на событие из ViewModel
+            _viewModel.RequestOpenAddAccountWindow += ViewModel_RequestOpenAddAccountWindow;
+            // Отписываемся, когда страница выгружается
+            Unloaded += (s, e) => _viewModel.RequestOpenAddAccountWindow -= ViewModel_RequestOpenAddAccountWindow;
         }
 
-        private void LoadAccounts()
+        private async void ViewModel_RequestOpenAddAccountWindow()
         {
-            var accounts = _context.Accounts
-                .Where(a => a.UserId == _currentUser.Id)
-                .ToList();
-            AccountsListView.ItemsSource = accounts;
-        }
+            // Теперь View отвечает за создание и отображение View-элементов.
+            // Мы получаем AccountService "снаружи", так как у ViewModel его нет в публичных свойствах.
+            // В более крупной системе это решалось бы через Dependency Injection.
+            var accountService = new AccountService(new KopilkaDbContext());
+            var addAccountWindow = new AddEditAccountWindow(accountService, _viewModel.CurrentUser.Id);
 
-        private void EditAccount_Click(object sender, RoutedEventArgs e)
-        {
-            // Получаем счет из контекста данных кнопки
-            if ((sender as FrameworkElement)?.DataContext is Account accountToEdit)
+            if (addAccountWindow.ShowDialog() == true)
             {
-                var editWindow = new AddEditAccountWindow(_accountService, _currentUser.Id, accountToEdit)
-                {
-                    Owner = Window.GetWindow(this)
-                };
-
-                if (editWindow.ShowDialog() == true)
-                {
-                    // Если окно было закрыто с успехом (нажата кнопка "Сохранить"),
-                    // обновляем список счетов
-                    LoadAccounts();
-                }
-            }
-        }
-
-        private void AddAccount_Click(object sender, RoutedEventArgs e)
-        {
-            var addWindow = new AddEditAccountWindow(_accountService, _currentUser.Id)
-            {
-                Owner = Window.GetWindow(this)
-            };
-
-            if (addWindow.ShowDialog() == true)
-            {
-                // Обновляем список после добавления
-                LoadAccounts();
+                // Если счет был успешно добавлен, просим ViewModel обновить данные.
+                await _viewModel.RefreshDataAsync();
             }
         }
     }

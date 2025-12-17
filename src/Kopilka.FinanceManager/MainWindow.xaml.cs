@@ -2,7 +2,13 @@ using Kopilka.BusinessLogic;
 using Kopilka.DataAccess;
 using Kopilka.FinanceManager.Views;
 using Kopilka.FinanceManager.Views.Pages;
-using Kopilka.Shared;
+using Kopilka.BusinessLogic;
+using Kopilka.BusinessLogic.Services;
+using Kopilka.BusinessLogic.ViewModels;
+using Kopilka.DataAccess;
+using Kopilka.FinanceManager.Views;
+using Kopilka.FinanceManager.Views.Pages;
+using Kopilka.Shared.Models;
 using System.Linq;
 using System.Windows;
 
@@ -18,43 +24,61 @@ namespace Kopilka.FinanceManager
         private readonly UserService _userService;
         private readonly AuthService _authService;
 
+        private readonly StateService _stateService;
+
         public MainWindow(User user, KopilkaDbContext dbContext)
         {
             InitializeComponent();
             _currentUser = user;
             _dbContext = dbContext;
 
+            // Инициализация сервисов
             _transactionService = new TransactionService(_dbContext);
             _accountService = new AccountService(_dbContext);
             _categoryService = new CategoryService(_dbContext);
             _userService = new UserService(_dbContext);
             _authService = new AuthService(_dbContext);
 
-            LoadUserData();
-            NavigateToHome();
+            // Создание и инициализация единого StateService
+            _stateService = new StateService(_accountService, _transactionService);
+
+            // Загружаем данные асинхронно
+            Loaded += async (s, e) =>
+            {
+                await _stateService.InitializeAsync(_currentUser);
+                LoadUserData();
+                NavigateToHome();
+            };
         }
 
-        private async void LoadUserData()
+        private void LoadUserData()
         {
             UsernameTextBlock.Text = _currentUser.Login;
             if (!string.IsNullOrEmpty(_currentUser.Login))
             {
                 UserInitialTextBlock.Text = _currentUser.Login[0].ToString().ToUpper();
             }
-
-            var balance = await _transactionService.GetTotalBalanceAsync(_currentUser.Id);
-            BalanceTextBlock.Text = $"Остаток: {balance:C}";
+            // Баланс теперь берем из StateService
+            BalanceTextBlock.Text = $"Остаток: {_stateService.TotalBalance:C}";
+            _stateService.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(StateService.TotalBalance))
+                {
+                    BalanceTextBlock.Text = $"Остаток: {_stateService.TotalBalance:C}";
+                }
+            };
         }
 
         private void NavigateToHome()
         {
-            // Теперь HomePage сам загружает свои данные, достаточно передать пользователя.
-            MainFrame.Navigate(new HomePage(_currentUser));
+            var homeViewModel = new HomePageViewModel(_stateService, _currentUser);
+            MainFrame.Navigate(new HomePage(homeViewModel)); // Передаем ViewModel в HomePage
         }
 
         private void NavigateToAccounts()
         {
-            MainFrame.Navigate(new Kopilka.FinanceManager.Views.Pages.AccountsPage(_dbContext, _currentUser));
+            var accountsViewModel = new AccountsViewModel(_accountService, _currentUser, _stateService);
+            MainFrame.Navigate(new AccountsPage(accountsViewModel));
         }
 
         private void HomeButton_Click(object sender, RoutedEventArgs e) => NavigateToHome();

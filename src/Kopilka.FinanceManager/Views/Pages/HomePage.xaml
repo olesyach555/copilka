@@ -18,39 +18,28 @@
         </Grid.RowDefinitions>
 
         <!-- Заголовок экрана -->
-        <TextBlock Grid.Row="0" Text="Главная" Style="{StaticResource HeaderTextStyle}" Margin="0,0,0,20" HorizontalAlignment="Center"/>
+        <TextBlock Grid.Row="0" Text="Главная" Style="{StaticResource TitleTextStyle}" HorizontalAlignment="Center" Margin="0,0,0,20"/>
 
         <!-- Блок с общей суммой -->
-        <Border Grid.Row="1" Background="White" CornerRadius="12" Padding="20" Margin="0,0,0,20">
+        <Border Grid.Row="1" Style="{StaticResource CardBorderStyle}" Padding="20">
             <StackPanel HorizontalAlignment="Center">
-                <TextBlock Text="ОБЩАЯ СУММА НА СЧЕТАХ" FontSize="18" Foreground="{StaticResource SecondaryTextBrush}" HorizontalAlignment="Center"/>
-                <TextBlock x:Name="TotalBalanceTextBlock"
-                           Text="0.00 ₽"
-                           FontFamily="Times New Roman"
+                <TextBlock Text="ОБЩАЯ СУММА НА СЧЕТАХ" Style="{StaticResource SecondaryTextStyle}" HorizontalAlignment="Center"/>
+                <TextBlock Text="{Binding TotalBalance, StringFormat='{}{0:N2} ₽'}"
+                           Style="{StaticResource TitleTextStyle}"
                            FontSize="48"
-                           FontWeight="Bold"
-                           Foreground="{StaticResource PrimaryTextBrush}"
-                           HorizontalAlignment="Center"
-                           Margin="0,10,0,0"/>
+                           Margin="0,10,0,0"
+                           HorizontalAlignment="Center"/>
             </StackPanel>
         </Border>
 
         <!-- Кнопки быстрых действий -->
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
-            <Button x:Name="AddIncomeButton" Content="+ Доход" Width="120" Height="60" Margin="0,0,10,0" Click="AddIncomeButton_Click">
-                <Button.ToolTip>
-                    <ToolTip Content="Добавить новую операцию дохода."/>
-                </Button.ToolTip>
-            </Button>
-            <Button x:Name="AddExpenseButton" Content="- Расход" Width="120" Height="60" Margin="10,0,0,0" Background="{StaticResource SecondaryAccentBrush}" Click="AddExpenseButton_Click">
-                 <Button.ToolTip>
-                    <ToolTip Content="Добавить новую операцию расхода."/>
-                </Button.ToolTip>
-            </Button>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
+            <Button x:Name="AddIncomeButton" Content="+ Доход" Width="120" Height="60" Style="{StaticResource AccentButtonStyle}" Click="AddIncomeButton_Click"/>
+            <Button x:Name="AddExpenseButton" Content="- Расход" Width="120" Height="60" Style="{StaticResource SecondaryAccentButtonStyle}" Margin="20,0,0,0" Click="AddExpenseButton_Click"/>
         </StackPanel>
 
-        <!-- Список последних транзакций -->
-        <ListView Grid.Row="3" x:Name="TransactionsListView" Margin="0">
+        <!-- Таблица последних транзакций -->
+        <ListView Grid.Row="3" x:Name="TransactionsListView" Style="{StaticResource StyledListViewStyle}" Margin="0,20,0,0">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Дата" DisplayMemberBinding="{Binding Date, StringFormat='dd.MM.yyyy'}" Width="150"/>
