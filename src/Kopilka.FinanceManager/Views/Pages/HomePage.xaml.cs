@@ -2,8 +2,10 @@ using Kopilka.BusinessLogic;
 using Kopilka.DataAccess;
 using Kopilka.Shared;
 using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using Microsoft.EntityFrameworkCore;
 
 namespace Kopilka.FinanceManager.Views.Pages
 {
@@ -23,32 +25,56 @@ namespace Kopilka.FinanceManager.Views.Pages
 
         private async void HomePage_Loaded(object sender, RoutedEventArgs e)
         {
+            await LoadHomePageDataAsync();
+        }
+
+        private async System.Threading.Tasks.Task LoadHomePageDataAsync()
+        {
             try
             {
-                // DbContext создается для каждой операции и автоматически освобождается
                 using (var dbContext = new KopilkaDbContext())
                 {
+                    // Загрузка последних транзакций
                     var transactionService = new TransactionService(dbContext);
                     var transactions = await transactionService.GetRecentTransactionsAsync(_currentUser.Id, 15);
                     TransactionsListView.ItemsSource = transactions;
+
+                    // Обновление общей суммы на счетах
+                    await UpdateTotalBalanceAsync(dbContext);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Произошла ошибка при загрузке транзакций: {ex.Message}",
+                MessageBox.Show($"Произошла ошибка при загрузке данных: {ex.Message}",
                                 "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private void AddTransactionButton_Click(object sender, RoutedEventArgs e)
+        private async System.Threading.Tasks.Task UpdateTotalBalanceAsync(KopilkaDbContext dbContext)
         {
-            // AddTransactionWindow управляет своим собственным DbContext, что является правильным
+            var totalBalance = await dbContext.Accounts
+                                              .Where(a => a.UserId == _currentUser.Id)
+                                              .SumAsync(a => a.Balance);
+            TotalBalanceTextBlock.Text = $"{totalBalance:N2} ₽";
+        }
+
+        private void AddIncomeButton_Click(object sender, RoutedEventArgs e)
+        {
+            OpenAddTransactionWindow();
+        }
+
+        private void AddExpenseButton_Click(object sender, RoutedEventArgs e)
+        {
+            OpenAddTransactionWindow();
+        }
+
+        private void OpenAddTransactionWindow()
+        {
             var addTransactionWindow = new AddTransactionWindow(_currentUser);
             if (addTransactionWindow.ShowDialog() == true)
             {
-                // Если транзакция была успешно добавлена, обновляем список,
-                // вызывая перезагрузку данных с новым DbContext.
-                HomePage_Loaded(this, new RoutedEventArgs());
+                // Если транзакция была успешно добавлена, обновляем все данные на странице
+                _ = LoadHomePageDataAsync();
             }
         }
     }
