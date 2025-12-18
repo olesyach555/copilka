@@ -1,14 +1,10 @@
 using Kopilka.BusinessLogic;
-using Kopilka.DataAccess;
-using Kopilka.FinanceManager.Views;
-using Kopilka.FinanceManager.Views.Pages;
-using Kopilka.BusinessLogic;
 using Kopilka.BusinessLogic.Services;
 using Kopilka.BusinessLogic.ViewModels;
 using Kopilka.DataAccess;
 using Kopilka.FinanceManager.Views;
 using Kopilka.FinanceManager.Views.Pages;
-using Kopilka.Shared.Models;
+using Kopilka.Shared;
 using System.Linq;
 using System.Windows;
 
