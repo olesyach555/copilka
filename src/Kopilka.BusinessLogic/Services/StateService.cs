@@ -22,6 +22,11 @@ namespace Kopilka.BusinessLogic.Services
         /// </summary>
         public ObservableCollection<Account> Accounts { get; } = new ObservableCollection<Account>();
 
+        /// <summary>
+        /// Коллекция последних транзакций для отображения на главной странице.
+        /// </summary>
+        public ObservableCollection<Transaction> Transactions { get; } = new ObservableCollection<Transaction>();
+
         [ObservableProperty]
         private decimal _totalBalance;
 
@@ -48,23 +53,23 @@ namespace Kopilka.BusinessLogic.Services
         {
             if (_currentUser == null) return;
 
-            try
+            // Загружаем счета
+            var userAccounts = await _accountService.GetAccountsAsync(_currentUser.Id);
+            Accounts.Clear();
+            foreach (var account in userAccounts)
             {
-                // Загружаем счета
-                var userAccounts = await _accountService.GetAccountsAsync(_currentUser.Id);
-                Accounts.Clear();
-                foreach (var account in userAccounts)
-                {
-                    Accounts.Add(account);
-                }
-
-                // Загружаем общий баланс
-                TotalBalance = await _transactionService.GetTotalBalanceAsync(_currentUser.Id);
+                Accounts.Add(account);
             }
-            catch (Exception ex)
+
+            // Загружаем общий баланс
+            TotalBalance = await _transactionService.GetTotalBalanceAsync(_currentUser.Id);
+
+            // Загружаем транзакции
+            var userTransactions = await _transactionService.GetTransactionsAsync(_currentUser.Id);
+            Transactions.Clear();
+            foreach (var transaction in userTransactions.OrderByDescending(t => t.Date).Take(20)) // Берем последние 20 для примера
             {
-                // Здесь нужна более серьезная обработка ошибок
-                Console.WriteLine($"Ошибка при обновлении состояния: {ex.Message}");
+                Transactions.Add(transaction);
             }
         }
     }

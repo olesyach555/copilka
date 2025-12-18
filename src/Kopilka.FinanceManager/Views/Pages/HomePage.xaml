@@ -39,7 +39,7 @@
         </StackPanel>
 
         <!-- Таблица последних транзакций -->
-        <ListView Grid.Row="3" x:Name="TransactionsListView" Style="{StaticResource StyledListViewStyle}" Margin="0,20,0,0">
+        <ListView Grid.Row="3" ItemsSource="{Binding Transactions}" Style="{StaticResource StyledListViewStyle}" Margin="0,20,0,0">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Дата" DisplayMemberBinding="{Binding Date, StringFormat='dd.MM.yyyy'}" Width="150"/>

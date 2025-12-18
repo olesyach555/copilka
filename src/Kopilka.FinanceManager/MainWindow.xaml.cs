@@ -41,9 +41,17 @@ namespace Kopilka.FinanceManager
             // Загружаем данные асинхронно
             Loaded += async (s, e) =>
             {
-                await _stateService.InitializeAsync(_currentUser);
-                LoadUserData();
-                NavigateToHome();
+                try
+                {
+                    await _stateService.InitializeAsync(_currentUser);
+                    LoadUserData();
+                    NavigateToHome();
+                }
+                catch (System.Exception ex)
+                {
+                    MessageBox.Show($"Произошла критическая ошибка при загрузке данных: {ex.Message}. Приложение может работать некорректно.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    // Можно также добавить логирование ошибки
+                }
             };
         }
 
@@ -74,7 +82,7 @@ namespace Kopilka.FinanceManager
         private void NavigateToAccounts()
         {
             var accountsViewModel = new AccountsViewModel(_accountService, _currentUser, _stateService);
-            MainFrame.Navigate(new AccountsPage(accountsViewModel));
+            MainFrame.Navigate(new AccountsPage(accountsViewModel, _accountService));
         }
 
         private void HomeButton_Click(object sender, RoutedEventArgs e) => NavigateToHome();

@@ -19,6 +19,11 @@ namespace Kopilka.BusinessLogic.ViewModels
         /// </summary>
         public decimal TotalBalance => _stateService.TotalBalance;
 
+        /// <summary>
+        /// Коллекция транзакций для отображения. Напрямую "проксирует" коллекцию из StateService.
+        /// </summary>
+        public ObservableCollection<Transaction> Transactions => _stateService.Transactions;
+
         public HomePageViewModel(StateService stateService, User currentUser)
         {
             _stateService = stateService;
@@ -30,6 +35,9 @@ namespace Kopilka.BusinessLogic.ViewModels
                 if (args.PropertyName == nameof(StateService.TotalBalance))
                 {
                     OnPropertyChanged(nameof(TotalBalance));
+                    // Так как транзакции загружаются вместе с балансом,
+                    // мы также оповещаем View, что коллекция могла измениться.
+                    OnPropertyChanged(nameof(Transactions));
                 }
             };
         }

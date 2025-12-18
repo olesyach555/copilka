@@ -31,9 +31,15 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="{Binding Name}" Style="{StaticResource BodyTextStyle}" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="1" Text="{Binding Balance, StringFormat='{}{0:N2} ₽'}" Style="{StaticResource BodyTextStyle}" FontWeight="Bold" VerticalAlignment="Center"/>
+                            <Button Grid.Column="1" Content="Редактировать"
+                                    Style="{StaticResource AccentButtonStyle}"
+                                    Margin="10,0"
+                                    Command="{Binding DataContext.EditAccountCommand, RelativeSource={RelativeSource AncestorType=ListView}}"
+                                    CommandParameter="{Binding}"/>
+                            <TextBlock Grid.Column="2" Text="{Binding Balance, StringFormat='{}{0:N2} ₽'}" Style="{StaticResource BodyTextStyle}" FontWeight="Bold" VerticalAlignment="Center"/>
                         </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>

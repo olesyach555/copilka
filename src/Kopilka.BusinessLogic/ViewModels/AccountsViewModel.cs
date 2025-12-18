@@ -13,11 +13,12 @@ namespace Kopilka.BusinessLogic.ViewModels
     /// </summary>
     public partial class AccountsViewModel : ViewModelBase
     {
-        private readonly AccountService _accountService; // Нужен для окна добавления
+        private readonly AccountService _accountService;
         private readonly StateService _stateService;
         public User CurrentUser { get; }
 
         public event Action RequestOpenAddAccountWindow;
+        public event Action<Account> RequestOpenEditAccountWindow;
 
         /// <summary>
         /// Коллекция счетов пользователя (получаем напрямую из StateService).
@@ -35,7 +36,6 @@ namespace Kopilka.BusinessLogic.ViewModels
             CurrentUser = currentUser;
             _stateService = stateService;
 
-            // Подписываемся на изменения в StateService, чтобы UI всегда был актуальным
             _stateService.PropertyChanged += (sender, args) =>
             {
                 if (args.PropertyName == nameof(StateService.TotalBalance))
@@ -57,6 +57,15 @@ namespace Kopilka.BusinessLogic.ViewModels
         private void AddAccount()
         {
             RequestOpenAddAccountWindow?.Invoke();
+        }
+
+        [RelayCommand]
+        private void EditAccount(Account account)
+        {
+            if (account != null)
+            {
+                RequestOpenEditAccountWindow?.Invoke(account);
+            }
         }
     }
 }
