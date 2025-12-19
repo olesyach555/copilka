@@ -2,12 +2,13 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <!-- Цветовая схема "Весенний лес" -->
-    <SolidColorBrush x:Key="MainBackgroundBrush" Color="#F0F8F0"/>
-    <SolidColorBrush x:Key="AccentBrush" Color="#90EE90"/>
-    <SolidColorBrush x:Key="SecondaryAccentBrush" Color="#98D8C8"/>
+    <SolidColorBrush x:Key="MainBackgroundBrush" Color="#F2F5DE"/>
+    <SolidColorBrush x:Key="AccentBrush" Color="#93FF96"/>
+    <SolidColorBrush x:Key="SecondaryAccentBrush" Color="#B2FFA8"/>
     <SolidColorBrush x:Key="PrimaryTextBrush" Color="#2F4F2F"/>
     <SolidColorBrush x:Key="SecondaryTextBrush" Color="#6B8E23"/>
     <SolidColorBrush x:Key="WarningBrush" Color="#FFDAB9"/>
+    <SolidColorBrush x:Key="ButtonPressedBrush" Color="#D0FFB7"/>
 
     <!-- Базовый стиль для всего текста -->
     <Style TargetType="TextBlock">
@@ -32,9 +33,14 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border Background="{TemplateBinding Background}" CornerRadius="12">
+                    <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="12">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{StaticResource ButtonPressedBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
