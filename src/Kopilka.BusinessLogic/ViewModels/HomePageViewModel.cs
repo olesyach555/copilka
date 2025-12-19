@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Kopilka.BusinessLogic.Services;
 using Kopilka.BusinessLogic.ViewModels.Base;
 using Kopilka.Shared;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
 namespace Kopilka.BusinessLogic.ViewModels

@@ -65,9 +65,9 @@ namespace Kopilka.BusinessLogic.Services
             TotalBalance = await _transactionService.GetTotalBalanceAsync(_currentUser.Id);
 
             // Загружаем транзакции
-            var userTransactions = await _transactionService.GetTransactionsAsync(_currentUser.Id);
+            var userTransactions = await _transactionService.GetRecentTransactionsAsync(_currentUser.Id, 50); // Загружаем 50 последних транзакций
             Transactions.Clear();
-            foreach (var transaction in userTransactions.OrderByDescending(t => t.Date).Take(20)) // Берем последние 20 для примера
+            foreach (var transaction in userTransactions) // Коллекция уже отсортирована и ограничена по количеству
             {
                 Transactions.Add(transaction);
             }
