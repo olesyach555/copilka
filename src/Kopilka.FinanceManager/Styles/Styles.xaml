@@ -1,14 +1,14 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <!-- Цветовая схема "Весенний лес" -->
-    <SolidColorBrush x:Key="MainBackgroundBrush" Color="#F2F5DE"/>
-    <SolidColorBrush x:Key="AccentBrush" Color="#93FF96"/>
-    <SolidColorBrush x:Key="SecondaryAccentBrush" Color="#B2FFA8"/>
-    <SolidColorBrush x:Key="PrimaryTextBrush" Color="#2F4F2F"/>
-    <SolidColorBrush x:Key="SecondaryTextBrush" Color="#6B8E23"/>
-    <SolidColorBrush x:Key="WarningBrush" Color="#FFDAB9"/>
-    <SolidColorBrush x:Key="ButtonPressedBrush" Color="#D0FFB7"/>
+    <!-- Новая цветовая схема -->
+    <SolidColorBrush x:Key="MainBackgroundBrush" Color="#D9ED92"/>
+    <SolidColorBrush x:Key="AccentBrush" Color="#34A0A4"/>
+    <SolidColorBrush x:Key="SecondaryAccentBrush" Color="#52B69A"/>
+    <SolidColorBrush x:Key="PrimaryTextBrush" Color="#000000"/>
+    <SolidColorBrush x:Key="SecondaryTextBrush" Color="#1E6091"/>
+    <SolidColorBrush x:Key="WarningBrush" Color="#76C893"/>
+    <SolidColorBrush x:Key="ButtonPressedBrush" Color="#1E6091"/>
 
     <!-- Базовый стиль для всего текста -->
     <Style TargetType="TextBlock">
@@ -82,6 +82,8 @@
         <Setter Property="Background" Value="White"/>
         <Setter Property="CornerRadius" Value="12"/>
         <Setter Property="Padding" Value="15"/>
+        <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
     </Style>
 
     <!-- Стиль для вторичного текста -->
