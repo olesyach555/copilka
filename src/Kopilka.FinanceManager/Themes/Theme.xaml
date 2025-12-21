@@ -6,7 +6,8 @@
     <!-- Фоны -->
     <SolidColorBrush x:Key="BgPrimaryLight" Color="#FFFFFF"/>
     <SolidColorBrush x:Key="BgPrimaryDark" Color="#00171F"/>
-    <SolidColorBrush x:Key="BgSecondaryDark" Color="#003459"/>
+    <SolidColorBrush x:Key="BgSecondaryDark" Color="#468faf"/>
+    <SolidColorBrush x:Key="BgInput" Color="#bde0fe"/>
     <SolidColorBrush x:Key="BgAccent" Color="#007EA7"/>
 
     <!-- Текст -->
@@ -18,8 +19,8 @@
     <SolidColorBrush x:Key="BorderOnDark" Color="#FFFFFF"/>
 
     <!-- Ресурсы для тёмной темы (по умолчанию) -->
-    <SolidColorBrush x:Key="WindowBackground" Color="#00171F"/>
-    <SolidColorBrush x:Key="TextForeground" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="WindowBackground" Color="#a9d6e5"/>
+    <SolidColorBrush x:Key="TextForeground" Color="#012a4a"/>
     <SolidColorBrush x:Key="BorderColor" Color="#FFFFFF"/>
 
     <!-- Глобальные (неявные) стили -->
@@ -38,38 +39,38 @@
 
     <!-- Стили для полей ввода -->
     <Style TargetType="TextBox">
-        <Setter Property="Background" Value="{StaticResource BgSecondaryDark}"/>
-        <Setter Property="Foreground" Value="{StaticResource TextOnDark}"/>
+        <Setter Property="Background" Value="{StaticResource BgInput}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextForeground}"/>
         <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Padding" Value="5"/>
     </Style>
 
      <Style TargetType="PasswordBox">
-        <Setter Property="Background" Value="{StaticResource BgSecondaryDark}"/>
-        <Setter Property="Foreground" Value="{StaticResource TextOnDark}"/>
+        <Setter Property="Background" Value="{StaticResource BgInput}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextForeground}"/>
         <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Padding" Value="5"/>
     </Style>
 
     <Style TargetType="ComboBox">
-        <Setter Property="Background" Value="{StaticResource BgSecondaryDark}"/>
-        <Setter Property="Foreground" Value="{StaticResource TextOnDark}"/>
+        <Setter Property="Background" Value="{StaticResource BgInput}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextForeground}"/>
         <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
         <Setter Property="BorderThickness" Value="1"/>
     </Style>
 
     <Style TargetType="DatePicker">
-        <Setter Property="Background" Value="{StaticResource BgSecondaryDark}"/>
-        <Setter Property="Foreground" Value="{StaticResource TextOnDark}"/>
+        <Setter Property="Background" Value="{StaticResource BgInput}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextForeground}"/>
         <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
         <Setter Property="BorderThickness" Value="1"/>
     </Style>
 
     <Style TargetType="ListView">
-        <Setter Property="Background" Value="{StaticResource BgSecondaryDark}"/>
-        <Setter Property="Foreground" Value="{StaticResource TextOnDark}"/>
+        <Setter Property="Background" Value="{StaticResource BgInput}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextForeground}"/>
         <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
         <Setter Property="BorderThickness" Value="1"/>
     </Style>

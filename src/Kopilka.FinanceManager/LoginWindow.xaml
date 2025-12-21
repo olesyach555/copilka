@@ -8,9 +8,9 @@
         Title="Kopilka - Вход" Height="450" Width="400"
         WindowStartupLocation="CenterScreen">
     <Grid>
-        <Border CornerRadius="10" BorderBrush="{StaticResource BorderColor}" BorderThickness="1" Padding="20" Margin="20" Background="{StaticResource BgSecondaryDark}">
+        <Border CornerRadius="10" BorderBrush="{StaticResource BorderColor}" BorderThickness="1" Padding="20" Margin="20" Background="Transparent">
             <StackPanel VerticalAlignment="Center">
-                <TextBlock Text="Вход в Копилку" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+                <TextBlock Text="Вход в Копилку" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,20" Foreground="{StaticResource TextForeground}"/>
 
                 <Grid x:Name="LoginGrid">
                     <StackPanel>
