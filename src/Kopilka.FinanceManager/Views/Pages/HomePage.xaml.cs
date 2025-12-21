@@ -12,9 +12,9 @@ namespace Kopilka.FinanceManager.Views.Pages
     /// </summary>
     public partial class HomePage : Page
     {
-        private readonly User _currentUser;
+        private readonly User? _currentUser;
 
-        public HomePage(User currentUser)
+        public HomePage(User? currentUser)
         {
             InitializeComponent();
             _currentUser = currentUser;
@@ -23,6 +23,12 @@ namespace Kopilka.FinanceManager.Views.Pages
 
         private async void HomePage_Loaded(object sender, RoutedEventArgs e)
         {
+            if (_currentUser == null)
+            {
+                TransactionsListView.ItemsSource = null;
+                return;
+            }
+
             try
             {
                 // DbContext создается для каждой операции и автоматически освобождается
@@ -42,6 +48,11 @@ namespace Kopilka.FinanceManager.Views.Pages
 
         private void AddTransactionButton_Click(object sender, RoutedEventArgs e)
         {
+            if (_currentUser == null)
+            {
+                MessageBox.Show("Для добавления транзакции необходимо войти в систему.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
             // AddTransactionWindow управляет своим собственным DbContext, что является правильным
             var addTransactionWindow = new AddTransactionWindow(_currentUser);
             if (addTransactionWindow.ShowDialog() == true)

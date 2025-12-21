@@ -8,9 +8,9 @@ namespace Kopilka.FinanceManager.Views
     public partial class CategoriesPage : UserControl
     {
         private readonly CategoryService _categoryService;
-        private readonly User _currentUser;
+        private readonly User? _currentUser;
 
-        public CategoriesPage(User currentUser, CategoryService categoryService)
+        public CategoriesPage(User? currentUser, CategoryService categoryService)
         {
             InitializeComponent();
             _currentUser = currentUser;
@@ -25,12 +25,22 @@ namespace Kopilka.FinanceManager.Views
 
         private async void LoadCategories()
         {
+            if (_currentUser == null)
+            {
+                CategoriesListView.ItemsSource = null;
+                return;
+            }
             var categories = await _categoryService.GetCategoriesAsync(_currentUser.Id);
             CategoriesListView.ItemsSource = categories;
         }
 
         private void AddCategoryButton_Click(object sender, RoutedEventArgs e)
         {
+            if (_currentUser == null)
+            {
+                MessageBox.Show("Для добавления категории необходимо войти в систему.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
             var addCategoryWindow = new AddEditCategoryWindow(_categoryService, _currentUser.Id);
             addCategoryWindow.Owner = Window.GetWindow(this);
             if (addCategoryWindow.ShowDialog() == true)
@@ -41,6 +51,7 @@ namespace Kopilka.FinanceManager.Views
 
         private void EditButton_Click(object sender, RoutedEventArgs e)
         {
+            if (_currentUser == null) return;
             if (sender is Button button && button.DataContext is Category category)
             {
                 var editCategoryWindow = new AddEditCategoryWindow(_categoryService, _currentUser.Id, category);

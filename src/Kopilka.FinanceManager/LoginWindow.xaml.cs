@@ -9,9 +9,9 @@ namespace Kopilka.FinanceManager
     public partial class LoginWindow : Window
     {
         private readonly AuthService _authService;
-        private readonly User _currentUser;
+        private readonly User? _currentUser;
 
-        public LoginWindow(AuthService authService, User currentUser = null)
+        public LoginWindow(AuthService authService, User? currentUser = null)
         {
             InitializeComponent();
             _authService = authService;
@@ -31,8 +31,7 @@ namespace Kopilka.FinanceManager
                 var user = await _authService.LoginAsync(LoginTextBox.Text, PasswordBox.Password);
                 if (user != null)
                 {
-                    Kopilka.FinanceManager.Properties.Settings.Default.LastUserId = user.Id;
-                    Kopilka.FinanceManager.Properties.Settings.Default.Save();
+                    SettingsService.SetLastUserId(user.Id);
                     DialogResult = true;
                     Close();
                 }
@@ -59,8 +58,7 @@ namespace Kopilka.FinanceManager
             {
                 var user = await _authService.RegisterUserAsync(LoginTextBox.Text, PasswordBox.Password);
 
-                Kopilka.FinanceManager.Properties.Settings.Default.LastUserId = user.Id;
-                Kopilka.FinanceManager.Properties.Settings.Default.Save();
+                SettingsService.SetLastUserId(user.Id);
 
                 DialogResult = true;
                 Close();
@@ -73,8 +71,7 @@ namespace Kopilka.FinanceManager
 
         private void LogoutButton_Click(object sender, RoutedEventArgs e)
         {
-            Kopilka.FinanceManager.Properties.Settings.Default.LastUserId = 0;
-            Kopilka.FinanceManager.Properties.Settings.Default.Save();
+            SettingsService.SetLastUserId(0);
             DialogResult = true;
             Close();
         }

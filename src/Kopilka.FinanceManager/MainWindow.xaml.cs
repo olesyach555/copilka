@@ -10,7 +10,7 @@ namespace Kopilka.FinanceManager
 {
     public partial class MainWindow : Window
     {
-        private User _currentUser;
+        private User? _currentUser;
         private readonly KopilkaDbContext _dbContext;
         private readonly TransactionService _transactionService;
         private readonly AccountService _accountService;
@@ -18,7 +18,7 @@ namespace Kopilka.FinanceManager
         private readonly UserService _userService;
         private readonly AuthService _authService;
 
-        public MainWindow(User user, KopilkaDbContext dbContext)
+        public MainWindow(User? user, KopilkaDbContext dbContext)
         {
             InitializeComponent();
             _currentUser = user;
@@ -90,8 +90,8 @@ namespace Kopilka.FinanceManager
 
             if (result == true)
             {
-                var lastUserId = Kopilka.FinanceManager.Properties.Settings.Default.LastUserId;
-                User user = null;
+                var lastUserId = SettingsService.GetLastUserId();
+                User? user = null;
                 if (lastUserId > 0)
                 {
                     // Используем новый DbContext чтобы получить актуальные данные, если они изменились
