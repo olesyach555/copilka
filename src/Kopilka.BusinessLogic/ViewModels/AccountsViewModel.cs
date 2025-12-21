@@ -1,6 +1,6 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Kopilka.BusinessLogic.Services;
-using Kopilka.BusinessLogic.ViewModels.Base;
+using Kopilka.BusinessLogic;
 using Kopilka.Shared;
 using System;
 using System.Collections.ObjectModel;
@@ -8,64 +8,38 @@ using System.Threading.Tasks;
 
 namespace Kopilka.BusinessLogic.ViewModels
 {
-    /// <summary>
-    /// ViewModel для страницы "Счета".
-    /// </summary>
-    public partial class AccountsViewModel : ViewModelBase
+    public partial class AccountsViewModel : ObservableObject
     {
-        private readonly AccountService _accountService;
-        private readonly StateService _stateService;
-        public User CurrentUser { get; }
+        public AccountService AccountService { get; }
+        public int UserId { get; }
 
-        public event Action RequestOpenAddAccountWindow;
-        public event Action<Account> RequestOpenEditAccountWindow;
+        public ObservableCollection<Account> Accounts { get; } = new();
 
-        /// <summary>
-        /// Коллекция счетов пользователя (получаем напрямую из StateService).
-        /// </summary>
-        public ObservableCollection<Account> Accounts => _stateService.Accounts;
-
-        /// <summary>
-        /// Общая сумма на всех счетах (проксируется из StateService).
-        /// </summary>
-        public decimal TotalBalance => _stateService.TotalBalance;
-
-        public AccountsViewModel(AccountService accountService, User currentUser, StateService stateService)
+        public AccountsViewModel(AccountService accountService, int userId)
         {
-            _accountService = accountService;
-            CurrentUser = currentUser;
-            _stateService = stateService;
-
-            _stateService.PropertyChanged += (sender, args) =>
-            {
-                if (args.PropertyName == nameof(StateService.TotalBalance))
-                {
-                    OnPropertyChanged(nameof(TotalBalance));
-                }
-            };
-        }
-
-        /// <summary>
-        /// Запрашивает у StateService полную перезагрузку данных.
-        /// </summary>
-        public async Task RefreshDataAsync()
-        {
-            await _stateService.ReloadAllDataAsync();
+            AccountService = accountService;
+            UserId = userId;
         }
 
         [RelayCommand]
-        private void AddAccount()
+        private async Task LoadAccountsAsync()
         {
-            RequestOpenAddAccountWindow?.Invoke();
-        }
-
-        [RelayCommand]
-        private void EditAccount(Account account)
-        {
-            if (account != null)
+            Accounts.Clear();
+            var accounts = await AccountService.GetAccountsAsync(UserId);
+            foreach (var acc in accounts)
             {
-                RequestOpenEditAccountWindow?.Invoke(account);
+                Accounts.Add(acc);
             }
         }
+
+        // События для открытия окон
+        public event Action? RequestOpenAddAccountWindow;
+        public event Action<Account>? RequestOpenEditAccountWindow;
+
+        [RelayCommand]
+        private void OpenAddAccount() => RequestOpenAddAccountWindow?.Invoke();
+
+        [RelayCommand]
+        private void OpenEditAccount(Account account) => RequestOpenEditAccountWindow?.Invoke(account);
     }
 }

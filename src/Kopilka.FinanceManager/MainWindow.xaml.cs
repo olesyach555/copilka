@@ -1,9 +1,8 @@
 using Kopilka.BusinessLogic;
+using Kopilka.BusinessLogic.ViewModels;
 using Kopilka.DataAccess;
-using Kopilka.FinanceManager.Views;
 using Kopilka.FinanceManager.Views.Pages;
 using Kopilka.Shared;
-using System.Linq;
 using System.Windows;
 
 namespace Kopilka.FinanceManager
@@ -48,13 +47,13 @@ namespace Kopilka.FinanceManager
 
         private void NavigateToHome()
         {
-            // Теперь HomePage сам загружает свои данные, достаточно передать пользователя.
             MainFrame.Navigate(new HomePage(_currentUser));
         }
 
         private void NavigateToAccounts()
         {
-            MainFrame.Navigate(new Kopilka.FinanceManager.Views.Pages.AccountsPage(_dbContext, _currentUser));
+            var accountsViewModel = new AccountsViewModel(_accountService, _currentUser.Id);
+            MainFrame.Navigate(new AccountsPage(accountsViewModel));
         }
 
         private void HomeButton_Click(object sender, RoutedEventArgs e) => NavigateToHome();

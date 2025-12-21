@@ -5,56 +5,31 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:local="clr-namespace:Kopilka.FinanceManager.Views.Pages"
       mc:Ignorable="d"
-      d:DesignHeight="600" d:DesignWidth="800"
-      Title="AccountsPage"
-      Background="{StaticResource MainBackgroundBrush}">
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="AccountsPage">
 
-    <Grid Margin="20">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Text="Счета" Style="{StaticResource HeaderTextStyle}" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+        <Button Content="Добавить счет" Command="{Binding OpenAddAccountCommand}" Style="{StaticResource PrimaryButton}" HorizontalAlignment="Left" Margin="10"/>
 
-        <Button Grid.Row="1" Content="Добавить счет" HorizontalAlignment="Right" Margin="0,0,0,20" Padding="15,8"
-                Style="{StaticResource AccentButtonStyle}"
-                Command="{Binding AddAccountCommand}"/>
-
-        <Border Grid.Row="2" Style="{StaticResource CardBorderStyle}" Padding="15">
-            <ListView ItemsSource="{Binding Accounts}" Background="Transparent" BorderThickness="0">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="{Binding Name}" Style="{StaticResource BodyTextStyle}" VerticalAlignment="Center"/>
-                            <Button Grid.Column="1" Content="Редактировать"
-                                    Style="{StaticResource AccentButtonStyle}"
-                                    Margin="10,0"
-                                    Command="{Binding DataContext.EditAccountCommand, RelativeSource={RelativeSource AncestorType=ListView}}"
-                                    CommandParameter="{Binding}"/>
-                            <TextBlock Grid.Column="2" Text="{Binding Balance, StringFormat='{}{0:N2} ₽'}" Style="{StaticResource BodyTextStyle}" FontWeight="Bold" VerticalAlignment="Center"/>
-                        </Grid>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
-        </Border>
-
-        <Border Grid.Row="3" Style="{StaticResource CardBorderStyle}" Padding="15" Margin="0,20,0,0">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Text="ОБЩАЯ СУММА" Style="{StaticResource BodyTextStyle}" FontWeight="Bold" VerticalAlignment="Center"/>
-                <TextBlock Grid.Column="1" Text="{Binding TotalBalance, StringFormat='{}{0:N2} ₽'}" Style="{StaticResource HeaderTextStyle}" FontSize="28" VerticalAlignment="Center"/>
-            </Grid>
-        </Border>
+        <ListView Grid.Row="1" ItemsSource="{Binding Accounts}" Margin="10">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Название" DisplayMemberBinding="{Binding Name}" Width="200"/>
+                    <GridViewColumn Header="Баланс" DisplayMemberBinding="{Binding Balance, StringFormat='C'}" Width="150"/>
+                    <GridViewColumn Header="Действия" Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="Редакт." Command="{Binding DataContext.OpenEditAccountCommand, RelativeSource={RelativeSource AncestorType=ListView}}" CommandParameter="{Binding}" Style="{StaticResource SecondaryButton}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
     </Grid>
 </Page>

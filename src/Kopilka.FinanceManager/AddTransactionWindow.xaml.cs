@@ -13,7 +13,7 @@ namespace Kopilka.FinanceManager
         private readonly TransactionService _transactionService;
         private readonly KopilkaDbContext _dbContext;
         private readonly User _currentUser;
-        private Category _selectedCategory;
+        private Category? _selectedCategory; // Поле теперь nullable
 
         public AddTransactionWindow(User user)
         {

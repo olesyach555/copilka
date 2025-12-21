@@ -5,11 +5,11 @@ using System.Windows.Controls;
 
 namespace Kopilka.FinanceManager.Views
 {
-    public partial class SettingsPage : UserControl
+    public partial class SettingsPage : Page // Изменено с UserControl на Page
     {
-        private readonly UserService _userService;
-        private readonly AuthService _authService;
-        private readonly User _currentUser;
+        private readonly UserService? _userService;
+        private readonly AuthService? _authService;
+        private readonly User? _currentUser;
 
         public SettingsPage(User currentUser, UserService userService, AuthService authService)
         {
@@ -31,7 +31,7 @@ namespace Kopilka.FinanceManager.Views
 
         private async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            if (_currentUser != null)
+            if (_currentUser != null && _userService != null)
             {
                 _currentUser.Email = EmailTextBox.Text;
                 await _userService.UpdateUserAsync(_currentUser);
@@ -41,9 +41,12 @@ namespace Kopilka.FinanceManager.Views
 
         private void ChangePasswordButton_Click(object sender, RoutedEventArgs e)
         {
-            var changePasswordWindow = new ChangePasswordWindow(_authService, _userService, _currentUser);
-            changePasswordWindow.Owner = Window.GetWindow(this);
-            changePasswordWindow.ShowDialog();
+             if (_authService != null && _userService != null && _currentUser != null)
+            {
+                var changePasswordWindow = new ChangePasswordWindow(_authService, _userService, _currentUser);
+                changePasswordWindow.Owner = Window.GetWindow(this);
+                changePasswordWindow.ShowDialog();
+            }
         }
     }
 }
