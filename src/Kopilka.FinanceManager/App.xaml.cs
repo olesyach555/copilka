@@ -1,5 +1,6 @@
 using Kopilka.BusinessLogic;
 using Kopilka.DataAccess;
+using Kopilka.Shared;
 using Microsoft.EntityFrameworkCore;
 using System.Windows;
 
