@@ -8,12 +8,12 @@ namespace Kopilka.BusinessLogic.ViewModels
     /// </summary>
     public partial class MainViewModel : ViewModelBase
     {
-        private User _currentUser;
+        private User? _currentUser;
 
         /// <summary>
         /// Текущий аутентифицированный пользователь.
         /// </summary>
-        public User CurrentUser
+        public User? CurrentUser
         {
             get => _currentUser;
             set => SetProperty(ref _currentUser, value);

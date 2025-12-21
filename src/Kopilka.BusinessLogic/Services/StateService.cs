@@ -15,7 +15,7 @@ namespace Kopilka.BusinessLogic.Services
     {
         private readonly AccountService _accountService;
         private readonly TransactionService _transactionService;
-        private User _currentUser;
+        private User? _currentUser;
 
         /// <summary>
         /// Коллекция счетов, доступная для всех частей приложения.
