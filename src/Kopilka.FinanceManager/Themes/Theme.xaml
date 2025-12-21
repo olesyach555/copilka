@@ -18,9 +18,9 @@
     <SolidColorBrush x:Key="BorderOnDark" Color="#FFFFFF"/>
 
     <!-- Ресурсы для тёмной темы (по умолчанию) -->
-    <SolidColorBrush x:Key="WindowBackground" Color="{StaticResource ResourceKey=BgPrimaryDark}"/>
-    <SolidColorBrush x:Key="TextForeground" Color="{StaticResource ResourceKey=TextOnDark}"/>
-    <SolidColorBrush x:Key="BorderColor" Color="{StaticResource ResourceKey=BorderOnDark}"/>
+    <SolidColorBrush x:Key="WindowBackground" Color="#00171F"/>
+    <SolidColorBrush x:Key="TextForeground" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="BorderColor" Color="#FFFFFF"/>
 
     <!-- Глобальные (неявные) стили -->
 
