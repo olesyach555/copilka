@@ -45,5 +45,31 @@ namespace Kopilka.FinanceManager.Views.Pages
                                 "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+        private void AddExpenseButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentUser == null) return;
+
+            var addTransactionWindow = new AddTransactionWindow(_currentUser, "Expense");
+            addTransactionWindow.Owner = Window.GetWindow(this);
+            if (addTransactionWindow.ShowDialog() == true)
+            {
+                // Обновляем список транзакций после добавления новой
+                HomePage_Loaded(this, new RoutedEventArgs());
+            }
+        }
+
+        private void AddIncomeButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentUser == null) return;
+
+            var addTransactionWindow = new AddTransactionWindow(_currentUser, "Income");
+            addTransactionWindow.Owner = Window.GetWindow(this);
+            if (addTransactionWindow.ShowDialog() == true)
+            {
+                // Обновляем список транзакций после добавления новой
+                HomePage_Loaded(this, new RoutedEventArgs());
+            }
+        }
     }
 }

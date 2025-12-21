@@ -14,6 +14,11 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
+        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
+            <Button x:Name="AddExpenseButton" Content="Расход" Style="{StaticResource ExpenseIncomeButtonStyle}" Click="AddExpenseButton_Click"/>
+            <Button x:Name="AddIncomeButton" Content="Доход" Margin="10,0,0,0" Style="{StaticResource ExpenseIncomeButtonStyle}" Click="AddIncomeButton_Click"/>
+        </StackPanel>
+
         <ListView Grid.Row="1" x:Name="TransactionsListView" Margin="10">
             <ListView.View>
                 <GridView>

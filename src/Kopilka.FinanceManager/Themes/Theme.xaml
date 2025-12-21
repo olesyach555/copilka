@@ -107,7 +107,7 @@
 
     <Style x:Key="ExpenseIncomeButtonStyle" TargetType="Button">
         <Setter Property="Background" Value="#014f86"/>
-        <Setter Property="Foreground" Value="#89c2d9"/>
+        <Setter Property="Foreground" Value="White"/>
         <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Padding" Value="24,12"/>
