@@ -1,39 +1,54 @@
+using Kopilka.BusinessLogic;
+using Kopilka.DataAccess;
+using Kopilka.Shared;
 using System;
 using System.Windows;
 using System.Windows.Controls;
-using Kopilka.BusinessLogic.ViewModels;
-using Kopilka.DataAccess;
-using Kopilka.Shared;
 
 namespace Kopilka.FinanceManager.Views.Pages
 {
+    /// <summary>
+    /// Логика взаимодействия для HomePage.xaml
+    /// </summary>
     public partial class HomePage : Page
     {
-        private readonly HomePageViewModel _viewModel;
+        private readonly User _currentUser;
 
-        // Конструктор теперь принимает ViewModel
-        public HomePage(HomePageViewModel viewModel)
+        public HomePage(User currentUser)
         {
             InitializeComponent();
-            _viewModel = viewModel;
-            DataContext = _viewModel;
+            _currentUser = currentUser;
+            Loaded += HomePage_Loaded;
         }
 
-        private async void AddIncomeButton_Click(object sender, RoutedEventArgs e)
+        private async void HomePage_Loaded(object sender, RoutedEventArgs e)
         {
-            var addTransactionWindow = new AddTransactionWindow(_viewModel._currentUser);
-            if (addTransactionWindow.ShowDialog() == true)
+            try
             {
-                await _viewModel.RefreshDataAsync();
+                // DbContext создается для каждой операции и автоматически освобождается
+                using (var dbContext = new KopilkaDbContext())
+                {
+                    var transactionService = new TransactionService(dbContext);
+                    var transactions = await transactionService.GetRecentTransactionsAsync(_currentUser.Id, 15);
+                    TransactionsListView.ItemsSource = transactions;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Произошла ошибка при загрузке транзакций: {ex.Message}",
+                                "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private async void AddExpenseButton_Click(object sender, RoutedEventArgs e)
+        private void AddTransactionButton_Click(object sender, RoutedEventArgs e)
         {
-            var addTransactionWindow = new AddTransactionWindow(_viewModel._currentUser);
+            // AddTransactionWindow управляет своим собственным DbContext, что является правильным
+            var addTransactionWindow = new AddTransactionWindow(_currentUser);
             if (addTransactionWindow.ShowDialog() == true)
             {
-                await _viewModel.RefreshDataAsync();
+                // Если транзакция была успешно добавлена, обновляем список,
+                // вызывая перезагрузку данных с новым DbContext.
+                HomePage_Loaded(this, new RoutedEventArgs());
             }
         }
     }

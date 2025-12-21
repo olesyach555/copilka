@@ -5,48 +5,33 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:local="clr-namespace:Kopilka.FinanceManager.Views.Pages"
       mc:Ignorable="d"
-      d:DesignHeight="800" d:DesignWidth="1200"
-      Title="HomePage"
-      Background="{StaticResource MainBackgroundBrush}">
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="HomePage">
 
-    <Grid Margin="20">
+    <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Заголовок экрана -->
-        <TextBlock Grid.Row="0" Text="Главная" Style="{StaticResource HeaderTextStyle}" HorizontalAlignment="Center" Margin="0,0,0,20"/>
-
-        <!-- Блок с общей суммой -->
-        <Border Grid.Row="1" Style="{StaticResource CardBorderStyle}" Padding="20">
-            <StackPanel HorizontalAlignment="Center">
-                <TextBlock Text="ОБЩАЯ СУММА НА СЧЕТАХ" Style="{StaticResource SecondaryTextStyle}" HorizontalAlignment="Center"/>
-                <TextBlock Text="{Binding TotalBalance, StringFormat='{}{0:N2} ₽'}"
-                           Style="{StaticResource HeaderTextStyle}"
-                           FontSize="48"
-                           Margin="0,10,0,0"
-                           HorizontalAlignment="Center"/>
-            </StackPanel>
-        </Border>
-
-        <!-- Кнопки быстрых действий -->
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
-            <Button x:Name="AddIncomeButton" Content="+ Доход" Width="120" Height="60" Style="{StaticResource AccentButtonStyle}" Click="AddIncomeButton_Click"/>
-            <Button x:Name="AddExpenseButton" Content="- Расход" Width="120" Height="60" Style="{StaticResource SecondaryAccentButtonStyle}" Margin="20,0,0,0" Click="AddExpenseButton_Click"/>
+        <StackPanel Orientation="Horizontal" Margin="10">
+            <Button x:Name="AddTransactionButton" Content="Добавить транзакцию" Style="{StaticResource PrimaryButton}" Click="AddTransactionButton_Click">
+                <Button.ToolTip>
+                    <ToolTip>
+                        <TextBlock Text="Нажмите, чтобы добавить новую запись о доходе или расходе."/>
+                    </ToolTip>
+                </Button.ToolTip>
+            </Button>
         </StackPanel>
 
-        <!-- Таблица последних транзакций -->
-        <ListView Grid.Row="3" ItemsSource="{Binding Transactions}" Style="{StaticResource StyledListViewStyle}" Margin="0,20,0,0">
+        <ListView Grid.Row="1" x:Name="TransactionsListView" Margin="10">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Дата" DisplayMemberBinding="{Binding Date, StringFormat='dd.MM.yyyy'}" Width="150"/>
-                    <GridViewColumn Header="Тип" DisplayMemberBinding="{Binding Type}" Width="120"/>
-                    <GridViewColumn Header="Категория" DisplayMemberBinding="{Binding Category.Name}" Width="200"/>
-                    <GridViewColumn Header="Сумма" DisplayMemberBinding="{Binding Amount}" Width="150"/>
-                    <GridViewColumn Header="Комментарий" DisplayMemberBinding="{Binding Comment}" Width="350"/>
+                    <GridViewColumn Header="Дата" DisplayMemberBinding="{Binding Date, StringFormat='dd.MM.yyyy'}" Width="100"/>
+                    <GridViewColumn Header="Тип" DisplayMemberBinding="{Binding Type}" Width="80"/>
+                    <GridViewColumn Header="Категория" DisplayMemberBinding="{Binding Category.Name}" Width="120"/>
+                    <GridViewColumn Header="Сумма" DisplayMemberBinding="{Binding Amount}" Width="100"/>
+                    <GridViewColumn Header="Комментарий" DisplayMemberBinding="{Binding Comment}" Width="250"/>
                 </GridView>
             </ListView.View>
         </ListView>
