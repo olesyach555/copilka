@@ -9,9 +9,9 @@ namespace Kopilka.FinanceManager
     {
         private readonly CategoryService _categoryService;
         private readonly int _userId;
-        private Category _categoryToEdit;
+        private Category? _categoryToEdit; // Поле теперь nullable
 
-        public AddEditCategoryWindow(CategoryService categoryService, int userId, Category categoryToEdit = null)
+        public AddEditCategoryWindow(CategoryService categoryService, int userId, Category? categoryToEdit = null)
         {
             InitializeComponent();
             _categoryService = categoryService;

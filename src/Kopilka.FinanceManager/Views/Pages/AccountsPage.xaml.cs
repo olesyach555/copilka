@@ -1,69 +1,47 @@
-using Kopilka.BusinessLogic;
-using Kopilka.DataAccess;
+using Kopilka.BusinessLogic.ViewModels;
 using Kopilka.Shared;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 
 namespace Kopilka.FinanceManager.Views.Pages
 {
-    /// <summary>
-    /// Логика взаимодействия для AccountsPage.xaml
-    /// </summary>
     public partial class AccountsPage : Page
     {
-        private readonly KopilkaDbContext _context;
-        private readonly User _currentUser;
-        private readonly AccountService _accountService;
+        private readonly AccountsViewModel _viewModel;
 
-        public AccountsPage(KopilkaDbContext context, User currentUser)
+        public AccountsPage(AccountsViewModel viewModel)
         {
             InitializeComponent();
-            _context = context;
-            _currentUser = currentUser;
-            _accountService = new AccountService(_context); // Инициализируем сервис
-
-            LoadAccounts();
+            _viewModel = viewModel;
+            DataContext = _viewModel;
+            _viewModel.RequestOpenAddAccountWindow += OnRequestOpenAddAccountWindow;
+            _viewModel.RequestOpenEditAccountWindow += OnRequestOpenEditAccountWindow;
+            Loaded += async (s, e) => await _viewModel.LoadAccountsCommand.ExecuteAsync(null);
         }
 
-        private void LoadAccounts()
+        private void OnRequestOpenAddAccountWindow()
         {
-            var accounts = _context.Accounts
-                .Where(a => a.UserId == _currentUser.Id)
-                .ToList();
-            AccountsListView.ItemsSource = accounts;
-        }
-
-        private void EditAccount_Click(object sender, RoutedEventArgs e)
-        {
-            // Получаем счет из контекста данных кнопки
-            if ((sender as FrameworkElement)?.DataContext is Account accountToEdit)
-            {
-                var editWindow = new AddEditAccountWindow(_accountService, _currentUser.Id, accountToEdit)
-                {
-                    Owner = Window.GetWindow(this)
-                };
-
-                if (editWindow.ShowDialog() == true)
-                {
-                    // Если окно было закрыто с успехом (нажата кнопка "Сохранить"),
-                    // обновляем список счетов
-                    LoadAccounts();
-                }
-            }
-        }
-
-        private void AddAccount_Click(object sender, RoutedEventArgs e)
-        {
-            var addWindow = new AddEditAccountWindow(_accountService, _currentUser.Id)
+            var addWindow = new AddEditAccountWindow(_viewModel.AccountService, _viewModel.UserId)
             {
                 Owner = Window.GetWindow(this)
             };
 
             if (addWindow.ShowDialog() == true)
             {
-                // Обновляем список после добавления
-                LoadAccounts();
+                _viewModel.LoadAccountsCommand.Execute(null);
+            }
+        }
+
+        private void OnRequestOpenEditAccountWindow(Account accountToEdit)
+        {
+            var editWindow = new AddEditAccountWindow(_viewModel.AccountService, _viewModel.UserId, accountToEdit)
+            {
+                Owner = Window.GetWindow(this)
+            };
+
+            if (editWindow.ShowDialog() == true)
+            {
+                _viewModel.LoadAccountsCommand.Execute(null);
             }
         }
     }

@@ -8,7 +8,7 @@ namespace Kopilka.FinanceManager
     {
         private readonly AccountService _accountService;
         private readonly int _userId;
-        private Account _accountToEdit;
+        private Account? _accountToEdit; // Поле теперь nullable
 
         // Конструктор для добавления нового счета
         public AddEditAccountWindow(AccountService accountService, int userId)

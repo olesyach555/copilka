@@ -5,46 +5,31 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:local="clr-namespace:Kopilka.FinanceManager.Views.Pages"
       mc:Ignorable="d"
-      d:DesignHeight="600" d:DesignWidth="1000"
+      d:DesignHeight="450" d:DesignWidth="800"
       Title="AccountsPage">
 
-    <Grid Background="#F7F7F7">
-        <StackPanel Margin="20">
-            <TextBlock Text="Мои счета" FontSize="28" FontWeight="Bold" Foreground="#3A5A40" Margin="0,0,0,20"/>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-            <ListView x:Name="AccountsListView" BorderThickness="0" Background="Transparent">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <Border Background="White" CornerRadius="10" Padding="20" Margin="0,0,0,10">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
+        <Button Content="Добавить счет" Command="{Binding OpenAddAccountCommand}" Style="{StaticResource PrimaryButton}" HorizontalAlignment="Left" Margin="10"/>
 
-                                <TextBlock Text="{Binding Name}" FontSize="18" FontWeight="Medium" VerticalAlignment="Center"/>
-
-                                <TextBlock Grid.Column="1" FontSize="18" FontWeight="Bold" VerticalAlignment="Center" Margin="20,0">
-                                    <Run Text="{Binding Balance, StringFormat={}{0:N2}}"/>
-                                    <Run Text=" ₽"/>
-                                </TextBlock>
-
-                                <Button Grid.Column="2" Content="..." FontSize="16" FontWeight="Bold" Background="Transparent" BorderThickness="0" VerticalAlignment="Center" Click="EditAccount_Click"/>
-                            </Grid>
-                        </Border>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
-
-            <Button x:Name="AddAccountButton" Content="Добавить счет" HorizontalAlignment="Left" Margin="0,20,0,0" Padding="15,10" Background="#4F6F52" Foreground="White" BorderThickness="0" FontSize="16" Click="AddAccount_Click">
-                <Button.Resources>
-                    <Style TargetType="Border">
-                        <Setter Property="CornerRadius" Value="10"/>
-                    </Style>
-                </Button.Resources>
-            </Button>
-
-        </StackPanel>
+        <ListView Grid.Row="1" ItemsSource="{Binding Accounts}" Margin="10">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Название" DisplayMemberBinding="{Binding Name}" Width="200"/>
+                    <GridViewColumn Header="Баланс" DisplayMemberBinding="{Binding Balance, StringFormat='C'}" Width="150"/>
+                    <GridViewColumn Header="Действия" Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="Редакт." Command="{Binding DataContext.OpenEditAccountCommand, RelativeSource={RelativeSource AncestorType=ListView}}" CommandParameter="{Binding}" Style="{StaticResource SecondaryButton}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
     </Grid>
 </Page>
