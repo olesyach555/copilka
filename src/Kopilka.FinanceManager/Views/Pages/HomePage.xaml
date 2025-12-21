@@ -14,16 +14,6 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Orientation="Horizontal" Margin="10">
-            <Button x:Name="AddTransactionButton" Content="Добавить транзакцию" Style="{StaticResource PrimaryButton}" Click="AddTransactionButton_Click">
-                <Button.ToolTip>
-                    <ToolTip>
-                        <TextBlock Text="Нажмите, чтобы добавить новую запись о доходе или расходе."/>
-                    </ToolTip>
-                </Button.ToolTip>
-            </Button>
-        </StackPanel>
-
         <ListView Grid.Row="1" x:Name="TransactionsListView" Margin="10">
             <ListView.View>
                 <GridView>

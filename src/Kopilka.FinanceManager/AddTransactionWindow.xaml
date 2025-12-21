@@ -9,7 +9,7 @@
         Title="Добавление операции" Height="700" Width="400"
         WindowStartupLocation="CenterOwner">
     <Window.Resources>
-        <Style TargetType="Button" x:Key="CategoryButton" BasedOn="{StaticResource PrimaryButton}">
+        <Style TargetType="Button" x:Key="CategoryButton" BasedOn="{StaticResource ExpenseIncomeButtonStyle}">
             <Setter Property="Width" Value="80"/>
             <Setter Property="Height" Value="80"/>
             <Setter Property="Margin" Value="5"/>
@@ -71,8 +71,8 @@
 
                 <!-- Дата -->
                 <StackPanel Orientation="Horizontal" Margin="0,20,0,5">
-                    <Button x:Name="TodayButton" Content="Сегодня" Style="{StaticResource PrimaryButton}" Click="TodayButton_Click"/>
-                    <Button x:Name="YesterdayButton" Content="Вчера" Margin="10,0" Style="{StaticResource PrimaryButton}" Click="YesterdayButton_Click"/>
+                    <Button x:Name="TodayButton" Content="Сегодня" Style="{StaticResource ExpenseIncomeButtonStyle}" Click="TodayButton_Click"/>
+                    <Button x:Name="YesterdayButton" Content="Вчера" Margin="10,0" Style="{StaticResource ExpenseIncomeButtonStyle}" Click="YesterdayButton_Click"/>
                     <DatePicker x:Name="DatePicker" SelectedDate="{x:Static sys:DateTime.Now}"/>
                 </StackPanel>
 
@@ -84,6 +84,6 @@
         </ScrollViewer>
 
         <!-- Кнопка "Добавить" -->
-        <Button x:Name="AddButton" Grid.Row="2" Content="Добавить" FontSize="20" FontWeight="Bold" Margin="20" Style="{StaticResource PrimaryButton}" Click="AddButton_Click"/>
+        <Button x:Name="AddButton" Grid.Row="2" Content="Добавить" FontSize="20" FontWeight="Bold" Margin="20" Style="{StaticResource ExpenseIncomeButtonStyle}" Click="AddButton_Click"/>
     </Grid>
 </Window>

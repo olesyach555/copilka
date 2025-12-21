@@ -50,6 +50,19 @@
                 <!-- Разделитель -->
                 <Separator Margin="10" Background="{StaticResource BorderColor}"/>
 
+                <!-- Кнопки добавления транзакций -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button x:Name="AddExpenseButton" Content="Расход" Grid.Column="0" Margin="5" Style="{StaticResource ExpenseIncomeButtonStyle}" Click="AddExpenseButton_Click"/>
+                    <Button x:Name="AddIncomeButton" Content="Доход" Grid.Column="1" Margin="5" Style="{StaticResource ExpenseIncomeButtonStyle}" Click="AddIncomeButton_Click"/>
+                </Grid>
+
+                <!-- Разделитель -->
+                <Separator Margin="10" Background="{StaticResource BorderColor}"/>
+
                 <!-- Кнопки навигации -->
                 <Button x:Name="HomeButton" Content="Главная" Style="{StaticResource NavButtonStyle}" Click="HomeButton_Click"/>
                 <Button x:Name="AccountsButton" Content="Счета" Style="{StaticResource NavButtonStyle}" Click="AccountsButton_Click"/>

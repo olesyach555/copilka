@@ -45,22 +45,5 @@ namespace Kopilka.FinanceManager.Views.Pages
                                 "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
-        private void AddTransactionButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (_currentUser == null)
-            {
-                MessageBox.Show("Для добавления транзакции необходимо войти в систему.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-            // AddTransactionWindow управляет своим собственным DbContext, что является правильным
-            var addTransactionWindow = new AddTransactionWindow(_currentUser);
-            if (addTransactionWindow.ShowDialog() == true)
-            {
-                // Если транзакция была успешно добавлена, обновляем список,
-                // вызывая перезагрузку данных с новым DbContext.
-                HomePage_Loaded(this, new RoutedEventArgs());
-            }
-        }
     }
 }

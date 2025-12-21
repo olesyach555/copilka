@@ -106,5 +106,35 @@ namespace Kopilka.FinanceManager
                 NavigateToHome();
             }
         }
+
+        private void AddExpenseButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentUser == null)
+            {
+                MessageBox.Show("Для добавления расхода необходимо войти в систему.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            var addTransactionWindow = new AddTransactionWindow(_currentUser, "Expense");
+            if (addTransactionWindow.ShowDialog() == true)
+            {
+                LoadUserData();
+                NavigateToHome();
+            }
+        }
+
+        private void AddIncomeButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentUser == null)
+            {
+                MessageBox.Show("Для добавления дохода необходимо войти в систему.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            var addTransactionWindow = new AddTransactionWindow(_currentUser, "Income");
+            if (addTransactionWindow.ShowDialog() == true)
+            {
+                LoadUserData();
+                NavigateToHome();
+            }
+        }
     }
 }

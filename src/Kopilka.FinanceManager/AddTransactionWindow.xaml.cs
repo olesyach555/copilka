@@ -15,13 +15,22 @@ namespace Kopilka.FinanceManager
         private readonly User _currentUser;
         private Category? _selectedCategory; // Поле теперь nullable
 
-        public AddTransactionWindow(User user)
+        public AddTransactionWindow(User user, string transactionType = "Expense")
         {
             InitializeComponent();
             _currentUser = user;
             _dbContext = new KopilkaDbContext();
             _transactionService = new TransactionService(_dbContext);
             LoadInitialData();
+
+            if (transactionType == "Income")
+            {
+                TransactionTypeTabControl.SelectedIndex = 1;
+            }
+            else
+            {
+                TransactionTypeTabControl.SelectedIndex = 0;
+            }
         }
 
         private void LoadInitialData()
