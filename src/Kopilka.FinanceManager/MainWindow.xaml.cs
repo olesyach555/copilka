@@ -10,7 +10,7 @@ namespace Kopilka.FinanceManager
 {
     public partial class MainWindow : Window
     {
-        private readonly User _currentUser;
+        private User _currentUser;
         private readonly KopilkaDbContext _dbContext;
         private readonly TransactionService _transactionService;
         private readonly AccountService _accountService;
@@ -36,14 +36,23 @@ namespace Kopilka.FinanceManager
 
         private async void LoadUserData()
         {
-            UsernameTextBlock.Text = _currentUser.Login;
-            if (!string.IsNullOrEmpty(_currentUser.Login))
+            if (_currentUser != null)
             {
-                UserInitialTextBlock.Text = _currentUser.Login[0].ToString().ToUpper();
-            }
+                UsernameTextBlock.Text = _currentUser.Login;
+                if (!string.IsNullOrEmpty(_currentUser.Login))
+                {
+                    UserInitialTextBlock.Text = _currentUser.Login[0].ToString().ToUpper();
+                }
 
-            var balance = await _transactionService.GetTotalBalanceAsync(_currentUser.Id);
-            BalanceTextBlock.Text = $"Остаток: {balance:C}";
+                var balance = await _transactionService.GetTotalBalanceAsync(_currentUser.Id);
+                BalanceTextBlock.Text = $"Остаток: {balance:C}";
+            }
+            else
+            {
+                UsernameTextBlock.Text = "Гость";
+                UserInitialTextBlock.Text = "Г";
+                BalanceTextBlock.Text = "Остаток: 0,00 ₽";
+            }
         }
 
         private void NavigateToHome()
@@ -53,6 +62,7 @@ namespace Kopilka.FinanceManager
 
         private void NavigateToAccounts()
         {
+            if (_currentUser == null) return;
             var accountsViewModel = new AccountsViewModel(_accountService, _currentUser.Id);
             MainFrame.Navigate(new AccountsPage(accountsViewModel));
         }
@@ -60,9 +70,41 @@ namespace Kopilka.FinanceManager
         private void HomeButton_Click(object sender, RoutedEventArgs e) => NavigateToHome();
         private void AccountsButton_Click(object sender, RoutedEventArgs e) => NavigateToAccounts();
         private void ChartsButton_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ChartsPage());
-        private void CategoriesButton_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new CategoriesPage(_currentUser, _categoryService));
+        private void CategoriesButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentUser == null) return;
+            MainFrame.Navigate(new CategoriesPage(_currentUser, _categoryService));
+        }
         private void RegularPaymentsButton_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new RegularPaymentsPage());
         private void RemindersButton_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new RemindersPage());
-        private void SettingsButton_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new SettingsPage(_currentUser, _userService, _authService));
+        private void SettingsButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentUser == null) return;
+            MainFrame.Navigate(new SettingsPage(_currentUser, _userService, _authService));
+        }
+
+        private async void UserButton_Click(object sender, RoutedEventArgs e)
+        {
+            var loginWindow = new LoginWindow(_authService, _currentUser);
+            var result = loginWindow.ShowDialog();
+
+            if (result == true)
+            {
+                var lastUserId = Kopilka.FinanceManager.Properties.Settings.Default.LastUserId;
+                User user = null;
+                if (lastUserId > 0)
+                {
+                    // Используем новый DbContext чтобы получить актуальные данные, если они изменились
+                    using (var dbContext = new KopilkaDbContext())
+                    {
+                        user = await dbContext.Users.FindAsync(lastUserId);
+                    }
+                }
+                _currentUser = user;
+
+                LoadUserData();
+                NavigateToHome();
+            }
+        }
     }
 }

@@ -9,11 +9,19 @@ namespace Kopilka.FinanceManager
     public partial class LoginWindow : Window
     {
         private readonly AuthService _authService;
+        private readonly User _currentUser;
 
-        public LoginWindow(AuthService authService)
+        public LoginWindow(AuthService authService, User currentUser = null)
         {
             InitializeComponent();
             _authService = authService;
+            _currentUser = currentUser;
+
+            if (_currentUser != null)
+            {
+                LoginGrid.Visibility = Visibility.Collapsed;
+                LogoutButton.Visibility = Visibility.Visible;
+            }
         }
 
         private async void LoginButton_Click(object sender, RoutedEventArgs e)
@@ -23,9 +31,9 @@ namespace Kopilka.FinanceManager
                 var user = await _authService.LoginAsync(LoginTextBox.Text, PasswordBox.Password);
                 if (user != null)
                 {
-                    var dbContext = new KopilkaDbContext();
-                    var mainWindow = new MainWindow(user, dbContext);
-                    mainWindow.Show();
+                    Kopilka.FinanceManager.Properties.Settings.Default.LastUserId = user.Id;
+                    Kopilka.FinanceManager.Properties.Settings.Default.Save();
+                    DialogResult = true;
                     Close();
                 }
                 else
@@ -50,12 +58,25 @@ namespace Kopilka.FinanceManager
             try
             {
                 var user = await _authService.RegisterUserAsync(LoginTextBox.Text, PasswordBox.Password);
-                MessageBox.Show($"Пользователь {user.Login} успешно зарегистрирован!", "Регистрация успешна", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                Kopilka.FinanceManager.Properties.Settings.Default.LastUserId = user.Id;
+                Kopilka.FinanceManager.Properties.Settings.Default.Save();
+
+                DialogResult = true;
+                Close();
             }
             catch (Exception ex) // Отлавливаем ошибки валидации
             {
                 MessageBox.Show(ex.Message, "Ошибка регистрации", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private void LogoutButton_Click(object sender, RoutedEventArgs e)
+        {
+            Kopilka.FinanceManager.Properties.Settings.Default.LastUserId = 0;
+            Kopilka.FinanceManager.Properties.Settings.Default.Save();
+            DialogResult = true;
+            Close();
         }
 
         // Пустые обработчики для совместимости с XAML

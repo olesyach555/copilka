@@ -35,15 +35,17 @@
             <StackPanel Margin="10">
 
                 <!-- Информация о пользователе -->
-                <StackPanel Orientation="Horizontal" Margin="10">
-                    <Border CornerRadius="25" Width="50" Height="50" Background="{StaticResource BgAccent}" VerticalAlignment="Center">
-                        <TextBlock x:Name="UserInitialTextBlock" Text="T" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </Border>
-                    <StackPanel VerticalAlignment="Center" Margin="10,0,0,0">
-                        <TextBlock x:Name="UsernameTextBlock" Text="testuser" FontSize="16" FontWeight="Bold"/>
-                        <TextBlock x:Name="BalanceTextBlock" Text="Остаток: 0,00 ₽" FontSize="14"/>
+                <Button x:Name="UserButton" Click="UserButton_Click" Background="Transparent" BorderBrush="Transparent" HorizontalContentAlignment="Stretch">
+                    <StackPanel Orientation="Horizontal" Margin="10">
+                        <Border CornerRadius="25" Width="50" Height="50" Background="{StaticResource BgAccent}" VerticalAlignment="Center">
+                            <TextBlock x:Name="UserInitialTextBlock" Text="T" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center" Margin="10,0,0,0">
+                            <TextBlock x:Name="UsernameTextBlock" Text="testuser" FontSize="16" FontWeight="Bold"/>
+                            <TextBlock x:Name="BalanceTextBlock" Text="Остаток: 0,00 ₽" FontSize="14"/>
+                        </StackPanel>
                     </StackPanel>
-                </StackPanel>
+                </Button>
 
                 <!-- Разделитель -->
                 <Separator Margin="10" Background="{StaticResource BorderColor}"/>

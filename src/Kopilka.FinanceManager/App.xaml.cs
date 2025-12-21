@@ -20,8 +20,15 @@ namespace Kopilka.FinanceManager
 
             _authService = new AuthService(_dbContext);
 
-            var loginWindow = new LoginWindow(_authService);
-            loginWindow.Show();
+            var lastUserId = Kopilka.FinanceManager.Properties.Settings.Default.LastUserId;
+            User user = null;
+            if (lastUserId > 0)
+            {
+                user = _dbContext.Users.Find(lastUserId);
+            }
+
+            var mainWindow = new MainWindow(user, _dbContext);
+            mainWindow.Show();
         }
     }
 }
