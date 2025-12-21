@@ -2,6 +2,7 @@ using Kopilka.BusinessLogic;
 using Kopilka.BusinessLogic.ViewModels;
 using Kopilka.DataAccess;
 using Kopilka.FinanceManager.Views;
+using Kopilka.FinanceManager.Views.Pages;
 using Kopilka.Shared;
 using System.Windows;
 
@@ -9,13 +10,13 @@ namespace Kopilka.FinanceManager
 {
     public partial class MainWindow : Window
     {
-        private readonly User _currentUser = null!;
-        private readonly KopilkaDbContext _dbContext = null!;
-        private readonly TransactionService _transactionService = null!;
-        private readonly AccountService _accountService = null!;
-        private readonly CategoryService _categoryService = null!;
-        private readonly UserService _userService = null!;
-        private readonly AuthService _authService = null!;
+        private readonly User _currentUser;
+        private readonly KopilkaDbContext _dbContext;
+        private readonly TransactionService _transactionService;
+        private readonly AccountService _accountService;
+        private readonly CategoryService _categoryService;
+        private readonly UserService _userService;
+        private readonly AuthService _authService;
 
         public MainWindow(User user, KopilkaDbContext dbContext)
         {

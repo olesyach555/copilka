@@ -7,8 +7,8 @@ namespace Kopilka.FinanceManager
 {
     public partial class App : Application
     {
-        private KopilkaDbContext _dbContext;
-        private AuthService _authService;
+        private KopilkaDbContext _dbContext = null!;
+        private AuthService _authService = null!;
 
         protected override void OnStartup(StartupEventArgs e)
         {
