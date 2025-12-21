@@ -51,5 +51,15 @@ namespace Kopilka.Shared
         /// Навигационное свойство для связи со счетом.
         /// </summary>
         public Account Account { get; set; } = null!;
+
+        /// <summary>
+        /// Идентификатор пользователя, совершившего транзакцию.
+        /// </summary>
+        public int UserId { get; set; }
+
+        /// <summary>
+        /// Навигационное свойство для связи с пользователем.
+        /// </summary>
+        public User User { get; set; } = null!;
     }
 }

@@ -9,14 +9,29 @@
       Title="HomePage">
 
     <Grid>
-        <ListView Name="TransactionsListView">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal" Margin="10">
+            <Button x:Name="AddTransactionButton" Content="Добавить транзакцию" Style="{StaticResource PrimaryButton}" Click="AddTransactionButton_Click">
+                <Button.ToolTip>
+                    <ToolTip>
+                        <TextBlock Text="Нажмите, чтобы добавить новую запись о доходе или расходе."/>
+                    </ToolTip>
+                </Button.ToolTip>
+            </Button>
+        </StackPanel>
+
+        <ListView Grid.Row="1" x:Name="TransactionsListView" Margin="10">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Дата" DisplayMemberBinding="{Binding Date}" />
-                    <GridViewColumn Header="Сумма" DisplayMemberBinding="{Binding Amount}" />
-                    <GridViewColumn Header="Категория" DisplayMemberBinding="{Binding Category.Name}" />
-                    <GridViewColumn Header="Комментарий" DisplayMemberBinding="{Binding Comment}" />
-                    <GridViewColumn Header="Счет" DisplayMemberBinding="{Binding Account.Name}" />
+                    <GridViewColumn Header="Дата" DisplayMemberBinding="{Binding Date, StringFormat='dd.MM.yyyy'}" Width="100"/>
+                    <GridViewColumn Header="Тип" DisplayMemberBinding="{Binding Type}" Width="80"/>
+                    <GridViewColumn Header="Категория" DisplayMemberBinding="{Binding Category.Name}" Width="120"/>
+                    <GridViewColumn Header="Сумма" DisplayMemberBinding="{Binding Amount}" Width="100"/>
+                    <GridViewColumn Header="Комментарий" DisplayMemberBinding="{Binding Comment}" Width="250"/>
                 </GridView>
             </ListView.View>
         </ListView>

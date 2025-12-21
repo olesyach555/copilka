@@ -9,26 +9,16 @@
         WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
-        <Style x:Key="NavButtonStyle" TargetType="Button">
+        <!-- Локальный стиль для навигационных кнопок, основанный на глобальном -->
+        <Style x:Key="NavButtonStyle" TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="FontSize" Value="16"/>
-            <Setter Property="HorizontalAlignment" Value="Left"/>
-            <Setter Property="Padding" Value="15,10"/>
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" CornerRadius="5">
-                            <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#739072"/>
+                    <Setter Property="Background" Value="{StaticResource BgSecondaryDark}"/>
+                </Trigger>
+                 <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="{StaticResource BgAccent}"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -41,22 +31,22 @@
         </Grid.ColumnDefinitions>
 
         <!-- Левая навигационная панель -->
-        <Border Grid.Column="0" Background="#4F6F52">
+        <Border Grid.Column="0" Background="{StaticResource BgSecondaryDark}">
             <StackPanel Margin="10">
 
                 <!-- Информация о пользователе -->
                 <StackPanel Orientation="Horizontal" Margin="10">
-                    <Border CornerRadius="25" Width="50" Height="50" Background="#3A5A40" VerticalAlignment="Center">
-                        <TextBlock x:Name="UserInitialTextBlock" Text="T" FontSize="24" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Border CornerRadius="25" Width="50" Height="50" Background="{StaticResource BgAccent}" VerticalAlignment="Center">
+                        <TextBlock x:Name="UserInitialTextBlock" Text="T" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                     <StackPanel VerticalAlignment="Center" Margin="10,0,0,0">
-                        <TextBlock x:Name="UsernameTextBlock" Text="testuser" Foreground="White" FontSize="16" FontWeight="Bold"/>
-                        <TextBlock x:Name="BalanceTextBlock" Text="Остаток: 0,00 ₽" Foreground="White" FontSize="14"/>
+                        <TextBlock x:Name="UsernameTextBlock" Text="testuser" FontSize="16" FontWeight="Bold"/>
+                        <TextBlock x:Name="BalanceTextBlock" Text="Остаток: 0,00 ₽" FontSize="14"/>
                     </StackPanel>
                 </StackPanel>
 
                 <!-- Разделитель -->
-                <Separator Margin="10" Background="White"/>
+                <Separator Margin="10" Background="{StaticResource BorderColor}"/>
 
                 <!-- Кнопки навигации -->
                 <Button x:Name="HomeButton" Content="Главная" Style="{StaticResource NavButtonStyle}" Click="HomeButton_Click"/>

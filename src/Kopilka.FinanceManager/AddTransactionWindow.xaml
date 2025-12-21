@@ -7,37 +7,12 @@
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
         Title="Добавление операции" Height="700" Width="400"
-        WindowStartupLocation="CenterOwner"
-        Background="#FF1E3C30" Foreground="White">
+        WindowStartupLocation="CenterOwner">
     <Window.Resources>
-        <!-- Стили для вкладок -->
-        <Style TargetType="TabItem">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="TabItem">
-                        <Border x:Name="Border" BorderThickness="0,0,0,2" BorderBrush="Transparent" Margin="5">
-                            <ContentPresenter ContentSource="Header" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,5"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Border" Property="BorderBrush" Value="#FF6BBE9D"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="FontSize" Value="16"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-        </Style>
-
-        <!-- Стиль для кнопок категорий -->
-        <Style TargetType="Button" x:Key="CategoryButton">
+        <Style TargetType="Button" x:Key="CategoryButton" BasedOn="{StaticResource PrimaryButton}">
             <Setter Property="Width" Value="80"/>
             <Setter Property="Height" Value="80"/>
             <Setter Property="Margin" Value="5"/>
-            <Setter Property="Background" Value="#FF2A5242"/>
-            <Setter Property="Foreground" Value="White"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -71,7 +46,7 @@
             <StackPanel Margin="20,0">
                 <!-- Ввод суммы -->
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <TextBox x:Name="AmountTextBox" FontSize="48" Text="0" Background="Transparent" BorderThickness="0,0,0,1" BorderBrush="White" Foreground="White" Width="200" TextAlignment="Right"/>
+                    <TextBox x:Name="AmountTextBox" FontSize="48" Text="0" Background="Transparent" BorderThickness="0,0,0,1" Width="200" TextAlignment="Right"/>
                     <TextBlock Text="RUB" FontSize="32" VerticalAlignment="Center" Margin="10,0,0,0"/>
                 </StackPanel>
 
@@ -96,8 +71,8 @@
 
                 <!-- Дата -->
                 <StackPanel Orientation="Horizontal" Margin="0,20,0,5">
-                    <Button x:Name="TodayButton" Content="Сегодня" Click="TodayButton_Click"/>
-                    <Button x:Name="YesterdayButton" Content="Вчера" Margin="10,0" Click="YesterdayButton_Click"/>
+                    <Button x:Name="TodayButton" Content="Сегодня" Style="{StaticResource PrimaryButton}" Click="TodayButton_Click"/>
+                    <Button x:Name="YesterdayButton" Content="Вчера" Margin="10,0" Style="{StaticResource PrimaryButton}" Click="YesterdayButton_Click"/>
                     <DatePicker x:Name="DatePicker" SelectedDate="{x:Static sys:DateTime.Now}"/>
                 </StackPanel>
 
@@ -109,14 +84,6 @@
         </ScrollViewer>
 
         <!-- Кнопка "Добавить" -->
-        <Button x:Name="AddButton" Grid.Row="2" Content="Добавить" FontSize="20" FontWeight="Bold" Background="#FFD4AF37" Foreground="Black" Margin="20" Padding="15" Click="AddButton_Click">
-            <Button.Template>
-                <ControlTemplate TargetType="Button">
-                    <Border Background="{TemplateBinding Background}" CornerRadius="25">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </Border>
-                </ControlTemplate>
-            </Button.Template>
-        </Button>
+        <Button x:Name="AddButton" Grid.Row="2" Content="Добавить" FontSize="20" FontWeight="Bold" Margin="20" Style="{StaticResource PrimaryButton}" Click="AddButton_Click"/>
     </Grid>
 </Window>
