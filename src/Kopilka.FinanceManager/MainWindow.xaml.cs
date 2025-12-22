@@ -18,17 +18,23 @@ namespace Kopilka.FinanceManager
         private readonly UserService _userService;
         private readonly AuthService _authService;
 
-        public MainWindow(User? user, KopilkaDbContext dbContext)
+        public MainWindow(
+            User? user,
+            KopilkaDbContext dbContext,
+            TransactionService transactionService,
+            AccountService accountService,
+            CategoryService categoryService,
+            UserService userService,
+            AuthService authService)
         {
             InitializeComponent();
             _currentUser = user;
             _dbContext = dbContext;
-
-            _transactionService = new TransactionService(_dbContext);
-            _accountService = new AccountService(_dbContext);
-            _categoryService = new CategoryService(_dbContext);
-            _userService = new UserService(_dbContext);
-            _authService = new AuthService(_dbContext);
+            _transactionService = transactionService;
+            _accountService = accountService;
+            _categoryService = categoryService;
+            _userService = userService;
+            _authService = authService;
 
             LoadUserData();
             NavigateToHome();

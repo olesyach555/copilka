@@ -3,7 +3,7 @@ using Kopilka.Shared;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Kopilka.FinanceManager.Views
+namespace Kopilka.FinanceManager.Views.Pages
 {
     public partial class SettingsPage : Page // Изменено с UserControl на Page
     {
