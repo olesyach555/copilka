@@ -13,11 +13,13 @@ namespace Kopilka.FinanceManager.Views.Pages
     public partial class HomePage : Page
     {
         private readonly User? _currentUser;
+        private readonly TransactionService _transactionService;
 
-        public HomePage(User? currentUser)
+        public HomePage(User? currentUser, TransactionService transactionService)
         {
             InitializeComponent();
             _currentUser = currentUser;
+            _transactionService = transactionService;
             Loaded += HomePage_Loaded;
         }
 
@@ -31,13 +33,8 @@ namespace Kopilka.FinanceManager.Views.Pages
 
             try
             {
-                // DbContext создается для каждой операции и автоматически освобождается
-                using (var dbContext = new KopilkaDbContext())
-                {
-                    var transactionService = new TransactionService(dbContext);
-                    var transactions = await transactionService.GetRecentTransactionsAsync(_currentUser.Id, 15);
-                    TransactionsListView.ItemsSource = transactions;
-                }
+                var transactions = await _transactionService.GetRecentTransactionsAsync(_currentUser.Id, 15);
+                TransactionsListView.ItemsSource = transactions;
             }
             catch (Exception ex)
             {
@@ -54,8 +51,10 @@ namespace Kopilka.FinanceManager.Views.Pages
             addTransactionWindow.Owner = Window.GetWindow(this);
             if (addTransactionWindow.ShowDialog() == true)
             {
-                // Обновляем список транзакций после добавления новой
+                // Обновляем UI после добавления
                 HomePage_Loaded(this, new RoutedEventArgs());
+                var mainWindow = Window.GetWindow(this) as MainWindow;
+                mainWindow?.LoadUserDataPublic();
             }
         }
 
@@ -67,8 +66,50 @@ namespace Kopilka.FinanceManager.Views.Pages
             addTransactionWindow.Owner = Window.GetWindow(this);
             if (addTransactionWindow.ShowDialog() == true)
             {
-                // Обновляем список транзакций после добавления новой
+                // Обновляем UI после добавления
                 HomePage_Loaded(this, new RoutedEventArgs());
+                var mainWindow = Window.GetWindow(this) as MainWindow;
+                mainWindow?.LoadUserDataPublic();
+            }
+        }
+
+        private async void DeleteTransaction_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.Tag is int transactionId)
+            {
+                var result = MessageBox.Show("Вы уверены, что хотите удалить эту транзакцию?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                if (result == MessageBoxResult.Yes)
+                {
+                    try
+                    {
+                        await _transactionService.DeleteTransactionAsync(transactionId);
+
+                        // Обновляем UI после удаления
+                        HomePage_Loaded(this, new RoutedEventArgs());
+                        var mainWindow = Window.GetWindow(this) as MainWindow;
+                        mainWindow?.LoadUserDataPublic();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Ошибка при удалении транзакции: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
+        }
+
+        private void EditTransaction_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.Tag is Transaction transactionToEdit && _currentUser != null)
+            {
+                var editTransactionWindow = new AddTransactionWindow(_currentUser, transactionToEdit);
+                editTransactionWindow.Owner = Window.GetWindow(this);
+                if (editTransactionWindow.ShowDialog() == true)
+                {
+                    // Обновляем UI после редактирования
+                    HomePage_Loaded(this, new RoutedEventArgs());
+                    var mainWindow = Window.GetWindow(this) as MainWindow;
+                    mainWindow?.LoadUserDataPublic();
+                }
             }
         }
     }

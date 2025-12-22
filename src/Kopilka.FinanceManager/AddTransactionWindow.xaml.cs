@@ -13,7 +13,8 @@ namespace Kopilka.FinanceManager
         private readonly TransactionService _transactionService;
         private readonly KopilkaDbContext _dbContext;
         private readonly User _currentUser;
-        private Category? _selectedCategory; // Поле теперь nullable
+        private Category? _selectedCategory;
+        private readonly Transaction? _editingTransaction;
 
         public AddTransactionWindow(User user, string transactionType = "Expense")
         {
@@ -27,20 +28,52 @@ namespace Kopilka.FinanceManager
             {
                 TransactionTypeTabControl.SelectedIndex = 1;
             }
-            else
-            {
-                TransactionTypeTabControl.SelectedIndex = 0;
-            }
+        }
+
+        public AddTransactionWindow(User user, Transaction transactionToEdit)
+        {
+            InitializeComponent();
+            _currentUser = user;
+            _dbContext = new KopilkaDbContext();
+            _transactionService = new TransactionService(_dbContext);
+            _editingTransaction = transactionToEdit;
+
+            LoadInitialData();
+            LoadTransactionData();
+
+            Title = "Редактирование операции";
+            AddButton.Content = "Сохранить";
         }
 
         private void LoadInitialData()
         {
             AccountComboBox.ItemsSource = _dbContext.Accounts.Where(a => a.UserId == _currentUser.Id).ToList();
-            if (AccountComboBox.Items.Count > 0)
-            {
-                AccountComboBox.SelectedIndex = 0;
-            }
             LoadCategories("Expense");
+        }
+
+        private void LoadTransactionData()
+        {
+            if (_editingTransaction == null) return;
+
+            AmountTextBox.Text = _editingTransaction.Amount.ToString("F2");
+            DatePicker.SelectedDate = _editingTransaction.Date;
+            CommentTextBox.Text = _editingTransaction.Comment;
+
+            AccountComboBox.SelectedItem = ((System.Collections.Generic.List<Account>)AccountComboBox.ItemsSource)
+                .FirstOrDefault(a => a.Id == _editingTransaction.AccountId);
+
+            if (_editingTransaction.Type == "Income")
+            {
+                TransactionTypeTabControl.SelectedIndex = 1;
+                LoadCategories("Income");
+            }
+            else
+            {
+                TransactionTypeTabControl.SelectedIndex = 0;
+                LoadCategories("Expense");
+            }
+
+            _selectedCategory = _dbContext.Categories.Find(_editingTransaction.CategoryId);
         }
 
         private void LoadCategories(string type)
@@ -90,18 +123,30 @@ namespace Kopilka.FinanceManager
                 AccountComboBox.SelectedItem is Account account &&
                 DatePicker.SelectedDate is DateTime date)
             {
-                var transaction = new Transaction
+                if (_editingTransaction == null) // Режим создания
                 {
-                    Amount = amount,
-                    Type = _selectedCategory.Type,
-                    Date = date,
-                    Comment = CommentTextBox.Text,
-                    AccountId = account.Id,
-                    CategoryId = _selectedCategory.Id,
-                    UserId = _currentUser.Id
-                };
-
-                await _transactionService.AddTransactionAsync(transaction);
+                    var newTransaction = new Transaction
+                    {
+                        Amount = amount,
+                        Type = _selectedCategory.Type,
+                        Date = date,
+                        Comment = CommentTextBox.Text,
+                        AccountId = account.Id,
+                        CategoryId = _selectedCategory.Id,
+                        UserId = _currentUser.Id
+                    };
+                    await _transactionService.AddTransactionAsync(newTransaction);
+                }
+                else // Режим редактирования
+                {
+                    _editingTransaction.Amount = amount;
+                    _editingTransaction.Type = _selectedCategory.Type;
+                    _editingTransaction.Date = date;
+                    _editingTransaction.Comment = CommentTextBox.Text;
+                    _editingTransaction.AccountId = account.Id;
+                    _editingTransaction.CategoryId = _selectedCategory.Id;
+                    await _transactionService.UpdateTransactionAsync(_editingTransaction);
+                }
                 DialogResult = true;
             }
             else

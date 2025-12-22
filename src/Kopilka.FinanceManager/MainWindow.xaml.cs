@@ -36,11 +36,11 @@ namespace Kopilka.FinanceManager
             _userService = userService;
             _authService = authService;
 
-            LoadUserData();
+            LoadUserDataPublic();
             NavigateToHome();
         }
 
-        private async void LoadUserData()
+        public async void LoadUserDataPublic()
         {
             if (_currentUser != null)
             {
@@ -63,7 +63,7 @@ namespace Kopilka.FinanceManager
 
         private void NavigateToHome()
         {
-            MainFrame.Navigate(new HomePage(_currentUser));
+            MainFrame.Navigate(new HomePage(_currentUser, _transactionService));
         }
 
         private void NavigateToAccounts()
@@ -108,7 +108,7 @@ namespace Kopilka.FinanceManager
                 }
                 _currentUser = user;
 
-                LoadUserData();
+                LoadUserDataPublic();
                 NavigateToHome();
             }
         }
@@ -123,7 +123,7 @@ namespace Kopilka.FinanceManager
             var addTransactionWindow = new AddTransactionWindow(_currentUser, "Expense");
             if (addTransactionWindow.ShowDialog() == true)
             {
-                LoadUserData();
+                LoadUserDataPublic();
                 NavigateToHome();
             }
         }
@@ -138,7 +138,7 @@ namespace Kopilka.FinanceManager
             var addTransactionWindow = new AddTransactionWindow(_currentUser, "Income");
             if (addTransactionWindow.ShowDialog() == true)
             {
-                LoadUserData();
+                LoadUserDataPublic();
                 NavigateToHome();
             }
         }

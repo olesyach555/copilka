@@ -26,7 +26,17 @@
                     <GridViewColumn Header="Тип" DisplayMemberBinding="{Binding Type}" Width="80"/>
                     <GridViewColumn Header="Категория" DisplayMemberBinding="{Binding Category.Name}" Width="120"/>
                     <GridViewColumn Header="Сумма" DisplayMemberBinding="{Binding Amount}" Width="100"/>
-                    <GridViewColumn Header="Комментарий" DisplayMemberBinding="{Binding Comment}" Width="250"/>
+                    <GridViewColumn Header="Комментарий" DisplayMemberBinding="{Binding Comment}" Width="180"/>
+                    <GridViewColumn Header="Действия" Width="140">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content="Изм." Click="EditTransaction_Click" Tag="{Binding}"/>
+                                    <Button Content="Удалить" Click="DeleteTransaction_Click" Tag="{Binding Id}" Margin="5,0,0,0"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                 </GridView>
             </ListView.View>
         </ListView>

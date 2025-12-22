@@ -80,7 +80,7 @@ namespace Kopilka.BusinessLogic
         }
 
         /// <summary>
-        /// Асинхронно добавляет новую транзакцию и связанную с ней запись о дате.
+        /// Асинхронно добавляет новую транзакцию, обновляет баланс и создает запись о дате.
         /// </summary>
         /// <param name="transaction">Транзакция для добавления.</param>
         public async Task AddTransactionAsync(Transaction transaction)
@@ -92,12 +92,23 @@ namespace Kopilka.BusinessLogic
             }
 
             transaction.UserId = account.UserId;
-            _context.Transactions.Add(transaction);
+
+            if (transaction.Type == "Expense")
+            {
+                account.Balance -= transaction.Amount;
+            }
+            else if (transaction.Type == "Income")
+            {
+                account.Balance += transaction.Amount;
+            }
+            _context.Accounts.Update(account);
+
+            await _context.Transactions.AddAsync(transaction);
 
             var date = new Date
             {
                 DateTime = transaction.Date,
-                OperationType = $"Транзакция: {transaction.Amount} {transaction.Category.Type}"
+                OperationType = $"Добавлена транзакция: {transaction.Amount} {transaction.Type}"
             };
             _context.Dates.Add(date);
 
@@ -105,31 +116,109 @@ namespace Kopilka.BusinessLogic
         }
 
         /// <summary>
-        /// Асинхронно вычисляет общий баланс для пользователя на основе всех его транзакций.
+        /// Асинхронно обновляет существующую транзакцию, корректирует балансы и создает запись о дате.
+        /// </summary>
+        /// <param name="updatedTransaction">Обновленная транзакция.</param>
+        public async Task UpdateTransactionAsync(Transaction updatedTransaction)
+        {
+            var originalTransaction = await _context.Transactions
+                .AsNoTracking()
+                .FirstOrDefaultAsync(t => t.Id == updatedTransaction.Id);
+
+            if (originalTransaction == null)
+            {
+                throw new ArgumentException("Транзакция для обновления не найдена.");
+            }
+
+            var originalAccount = await _context.Accounts.FindAsync(originalTransaction.AccountId);
+            if (originalAccount != null)
+            {
+                if (originalTransaction.Type == "Expense")
+                {
+                    originalAccount.Balance += originalTransaction.Amount;
+                }
+                else if (originalTransaction.Type == "Income")
+                {
+                    originalAccount.Balance -= originalTransaction.Amount;
+                }
+                _context.Accounts.Update(originalAccount);
+            }
+
+            var newAccount = await _context.Accounts.FindAsync(updatedTransaction.AccountId);
+            if (newAccount != null)
+            {
+                updatedTransaction.UserId = newAccount.UserId;
+                if (updatedTransaction.Type == "Expense")
+                {
+                    newAccount.Balance -= updatedTransaction.Amount;
+                }
+                else if (updatedTransaction.Type == "Income")
+                {
+                    newAccount.Balance += updatedTransaction.Amount;
+                }
+                _context.Accounts.Update(newAccount);
+            }
+
+            _context.Transactions.Update(updatedTransaction);
+
+            var date = new Date
+            {
+                DateTime = updatedTransaction.Date,
+                OperationType = $"Изменена транзакция: {updatedTransaction.Amount} {updatedTransaction.Type}"
+            };
+            _context.Dates.Add(date);
+
+            await _context.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Асинхронно удаляет транзакцию, корректирует баланс и создает запись о дате.
+        /// </summary>
+        /// <param name="transactionId">ID транзакции для удаления.</param>
+        public async Task DeleteTransactionAsync(int transactionId)
+        {
+            var transaction = await _context.Transactions.FindAsync(transactionId);
+            if (transaction == null)
+            {
+                throw new ArgumentException("Транзакция для удаления не найдена.");
+            }
+
+            var account = await _context.Accounts.FindAsync(transaction.AccountId);
+            if (account != null)
+            {
+                if (transaction.Type == "Expense")
+                {
+                    account.Balance += transaction.Amount;
+                }
+                else if (transaction.Type == "Income")
+                {
+                    account.Balance -= transaction.Amount;
+                }
+                _context.Accounts.Update(account);
+            }
+
+            _context.Transactions.Remove(transaction);
+
+            var date = new Date
+            {
+                DateTime = transaction.Date,
+                OperationType = $"Удалена транзакция: {transaction.Amount} {transaction.Type}"
+            };
+            _context.Dates.Add(date);
+
+            await _context.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Асинхронно вычисляет общий баланс для пользователя на основе его счетов.
         /// </summary>
         /// <param name="userId">ID пользователя.</param>
         /// <returns>Общий баланс.</returns>
         public async Task<decimal> GetTotalBalanceAsync(int userId)
         {
-            var userAccountIds = await _context.Accounts
+            return await _context.Accounts
                 .Where(a => a.UserId == userId)
-                .Select(a => a.Id)
-                .ToListAsync();
-
-            if (!userAccountIds.Any())
-            {
-                return 0;
-            }
-
-            var totalIncome = await _context.Transactions
-                .Where(t => userAccountIds.Contains(t.AccountId) && t.Type == "Income")
-                .SumAsync(t => (double)t.Amount);
-
-            var totalExpenses = await _context.Transactions
-                .Where(t => userAccountIds.Contains(t.AccountId) && t.Type == "Expense")
-                .SumAsync(t => (double)t.Amount);
-
-            return (decimal)(totalIncome - totalExpenses);
+                .SumAsync(a => a.Balance);
         }
 
         /// <summary>
