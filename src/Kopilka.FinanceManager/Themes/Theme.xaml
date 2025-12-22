@@ -82,7 +82,8 @@
         <Setter Property="Foreground" Value="{StaticResource TextOnDark}"/>
         <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Padding" Value="24,12"/>
+        <Setter Property="Padding" Value="24,18"/>
+        <Setter Property="Margin" Value="0,5"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -106,8 +107,8 @@
     </Style>
 
     <Style x:Key="ExpenseIncomeButtonStyle" TargetType="Button">
-        <Setter Property="Background" Value="#014f86"/>
-        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Background" Value="{StaticResource BgSecondaryDark}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextOnDark}"/>
         <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Padding" Value="24,12"/>
@@ -125,10 +126,10 @@
         </Setter>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="#0267a3"/>
+                <Setter Property="Background" Value="#61a1c2"/>
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
-                <Setter Property="Background" Value="#003f6b"/>
+                <Setter Property="Background" Value="#3b7a9d"/>
             </Trigger>
         </Style.Triggers>
     </Style>
