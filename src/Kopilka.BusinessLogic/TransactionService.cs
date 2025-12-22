@@ -51,13 +51,11 @@ namespace Kopilka.BusinessLogic
                 .Select(a => a.Id)
                 .ToListAsync();
 
-            var transactions = await _context.Transactions
-                .Include(t => t.Category)
+            return (decimal)await _context.Transactions
                 .Where(t => userAccountIds.Contains(t.AccountId) &&
                             t.Date >= startDate && t.Date <= endDate &&
-                            t.Category.Type == "Income")
-                .ToListAsync();
-            return transactions.Sum(t => t.Amount);
+                            t.Type == "Income")
+                .SumAsync(t => (double)t.Amount);
         }
 
         /// <summary>
@@ -70,13 +68,11 @@ namespace Kopilka.BusinessLogic
                 .Select(a => a.Id)
                 .ToListAsync();
 
-            var transactions = await _context.Transactions
-                .Include(t => t.Category)
+            return (decimal)await _context.Transactions
                 .Where(t => userAccountIds.Contains(t.AccountId) &&
                             t.Date >= startDate && t.Date <= endDate &&
-                            t.Category.Type == "Expense")
-                .ToListAsync();
-            return transactions.Sum(t => t.Amount);
+                            t.Type == "Expense")
+                .SumAsync(t => (double)t.Amount);
         }
 
         /// <summary>
