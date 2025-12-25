@@ -11,12 +11,12 @@ namespace Kopilka.FinanceManager
     public partial class MainWindow : Window
     {
         private User? _currentUser;
-        private readonly KopilkaDbContext _dbContext;
-        private readonly TransactionService _transactionService;
-        private readonly AccountService _accountService;
-        private readonly CategoryService _categoryService;
-        private readonly UserService _userService;
-        private readonly AuthService _authService;
+        private readonly KopilkaDbContext _dbContext = null!;
+        private readonly TransactionService _transactionService = null!;
+        private readonly AccountService _accountService = null!;
+        private readonly CategoryService _categoryService = null!;
+        private readonly UserService _userService = null!;
+        private readonly AuthService _authService = null!;
 
         public MainWindow(
             User? user,
