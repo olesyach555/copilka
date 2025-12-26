@@ -11,12 +11,15 @@ namespace Kopilka.FinanceManager
     public partial class MainWindow : Window
     {
         private User? _currentUser;
-        private readonly KopilkaDbContext _dbContext;
-        private readonly TransactionService _transactionService;
-        private readonly AccountService _accountService;
-        private readonly CategoryService _categoryService;
-        private readonly UserService _userService;
-        private readonly AuthService _authService;
+        // Эти поля инициализируются в App.xaml.cs и передаются через конструктор.
+        // Оператор null-forgiving (!) используется для подавления предупреждения компилятора CS8618,
+        // так как мы гарантируем, что они никогда не будут null во время выполнения.
+        private readonly KopilkaDbContext _dbContext = null!;
+        private readonly TransactionService _transactionService = null!;
+        private readonly AccountService _accountService = null!;
+        private readonly CategoryService _categoryService = null!;
+        private readonly UserService _userService = null!;
+        private readonly AuthService _authService = null!;
 
         public MainWindow(
             User? user,
