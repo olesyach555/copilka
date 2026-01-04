@@ -29,12 +29,12 @@ namespace Kopilka.FinanceManager
         {
             InitializeComponent();
             _currentUser = user;
-            _dbContext = dbContext;
-            _transactionService = transactionService;
-            _accountService = accountService;
-            _categoryService = categoryService;
-            _userService = userService;
-            _authService = authService;
+            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+            _transactionService = transactionService ?? throw new ArgumentNullException(nameof(transactionService));
+            _accountService = accountService ?? throw new ArgumentNullException(nameof(accountService));
+            _categoryService = categoryService ?? throw new ArgumentNullException(nameof(categoryService));
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _authService = authService ?? throw new ArgumentNullException(nameof(authService));
 
             LoadUserDataPublic();
             NavigateToHome();
