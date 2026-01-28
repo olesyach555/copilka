@@ -19,4 +19,12 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.6" />
   </ItemGroup>
 
+  <!-- This ItemGroup is necessary to correctly compile XAML pages in subdirectories in SDK-style WPF projects. -->
+  <!-- It ensures that types like 'ChartsPage' are found by the compiler, resolving potential build errors. -->
+  <ItemGroup>
+    <Page Update="**\*.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
 </Project>
