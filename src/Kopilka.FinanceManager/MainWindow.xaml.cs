@@ -11,21 +11,21 @@ namespace Kopilka.FinanceManager
     public partial class MainWindow : Window
     {
         private User? _currentUser;
-        private readonly KopilkaDbContext _dbContext;
-        private readonly TransactionService _transactionService;
-        private readonly AccountService _accountService;
-        private readonly CategoryService _categoryService;
-        private readonly UserService _userService;
-        private readonly AuthService _authService;
+        private readonly KopilkaDbContext? _dbContext;
+        private readonly TransactionService? _transactionService;
+        private readonly AccountService? _accountService;
+        private readonly CategoryService? _categoryService;
+        private readonly UserService? _userService;
+        private readonly AuthService? _authService;
 
         public MainWindow(
             User? user,
-            KopilkaDbContext dbContext,
-            TransactionService transactionService,
-            AccountService accountService,
-            CategoryService categoryService,
-            UserService userService,
-            AuthService authService)
+            KopilkaDbContext? dbContext,
+            TransactionService? transactionService,
+            AccountService? accountService,
+            CategoryService? categoryService,
+            UserService? userService,
+            AuthService? authService)
         {
             InitializeComponent();
             _currentUser = user;
@@ -50,7 +50,7 @@ namespace Kopilka.FinanceManager
                     UserInitialTextBlock.Text = _currentUser.Login[0].ToString().ToUpper();
                 }
 
-                var balance = await _transactionService.GetTotalBalanceAsync(_currentUser.Id);
+                var balance = await _transactionService!.GetTotalBalanceAsync(_currentUser.Id);
                 BalanceTextBlock.Text = $"Остаток: {balance:C}";
             }
             else
@@ -63,13 +63,13 @@ namespace Kopilka.FinanceManager
 
         private void NavigateToHome()
         {
-            MainFrame.Navigate(new HomePage(_currentUser, _transactionService));
+            MainFrame.Navigate(new HomePage(_currentUser, _transactionService!));
         }
 
         private void NavigateToAccounts()
         {
             if (_currentUser == null) return;
-            var accountsViewModel = new AccountsViewModel(_accountService, _currentUser.Id);
+            var accountsViewModel = new AccountsViewModel(_accountService!, _currentUser.Id);
             MainFrame.Navigate(new AccountsPage(accountsViewModel));
         }
 
@@ -79,19 +79,19 @@ namespace Kopilka.FinanceManager
         private void CategoriesButton_Click(object sender, RoutedEventArgs e)
         {
             if (_currentUser == null) return;
-            MainFrame.Navigate(new CategoriesPage(_currentUser, _categoryService));
+            MainFrame.Navigate(new CategoriesPage(_currentUser, _categoryService!));
         }
         private void RegularPaymentsButton_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new RegularPaymentsPage());
         private void RemindersButton_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new RemindersPage());
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
             if (_currentUser == null) return;
-            MainFrame.Navigate(new SettingsPage(_currentUser, _userService, _authService));
+            MainFrame.Navigate(new SettingsPage(_currentUser, _userService!, _authService!));
         }
 
         private async void UserButton_Click(object sender, RoutedEventArgs e)
         {
-            var loginWindow = new LoginWindow(_authService, _currentUser);
+            var loginWindow = new LoginWindow(_authService!, _currentUser);
             var result = loginWindow.ShowDialog();
 
             if (result == true)

@@ -8,10 +8,10 @@ namespace Kopilka.FinanceManager
 {
     public partial class LoginWindow : Window
     {
-        private readonly AuthService _authService;
+        private readonly AuthService? _authService;
         private readonly User? _currentUser;
 
-        public LoginWindow(AuthService authService, User? currentUser = null)
+        public LoginWindow(AuthService? authService, User? currentUser = null)
         {
             InitializeComponent();
             _authService = authService;
@@ -26,6 +26,7 @@ namespace Kopilka.FinanceManager
 
         private async void LoginButton_Click(object sender, RoutedEventArgs e)
         {
+            if (_authService == null) return;
             try
             {
                 var user = await _authService.LoginAsync(LoginTextBox.Text, PasswordBox.Password);
@@ -54,6 +55,7 @@ namespace Kopilka.FinanceManager
                 return;
             }
 
+            if (_authService == null) return;
             try
             {
                 var user = await _authService.RegisterUserAsync(LoginTextBox.Text, PasswordBox.Password);

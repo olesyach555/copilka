@@ -10,13 +10,13 @@ namespace Kopilka.FinanceManager
 {
     public partial class AddTransactionWindow : Window
     {
-        private readonly TransactionService _transactionService;
-        private readonly KopilkaDbContext _dbContext;
-        private readonly User _currentUser;
+        private readonly TransactionService? _transactionService;
+        private readonly KopilkaDbContext? _dbContext;
+        private readonly User? _currentUser;
         private Category? _selectedCategory;
         private readonly Transaction? _editingTransaction;
 
-        public AddTransactionWindow(User user, string transactionType = "Expense")
+        public AddTransactionWindow(User? user, string transactionType = "Expense")
         {
             InitializeComponent();
             _currentUser = user;
@@ -30,7 +30,7 @@ namespace Kopilka.FinanceManager
             }
         }
 
-        public AddTransactionWindow(User user, Transaction transactionToEdit)
+        public AddTransactionWindow(User? user, Transaction transactionToEdit)
         {
             InitializeComponent();
             _currentUser = user;
@@ -47,6 +47,7 @@ namespace Kopilka.FinanceManager
 
         private void LoadInitialData()
         {
+            if (_currentUser == null || _dbContext == null) return;
             AccountComboBox.ItemsSource = _dbContext.Accounts.Where(a => a.UserId == _currentUser.Id).ToList();
             LoadCategories("Expense");
         }
@@ -73,11 +74,12 @@ namespace Kopilka.FinanceManager
                 LoadCategories("Expense");
             }
 
-            _selectedCategory = _dbContext.Categories.Find(_editingTransaction.CategoryId);
+            _selectedCategory = _dbContext!.Categories.Find(_editingTransaction.CategoryId);
         }
 
         private void LoadCategories(string type)
         {
+            if (_dbContext == null) return;
             CategoryItemsControl.ItemsSource = _dbContext.Categories.Where(c => c.Type == type).ToList();
         }
 
@@ -133,9 +135,9 @@ namespace Kopilka.FinanceManager
                         Comment = CommentTextBox.Text,
                         AccountId = account.Id,
                         CategoryId = _selectedCategory.Id,
-                        UserId = _currentUser.Id
+                        UserId = _currentUser!.Id
                     };
-                    await _transactionService.AddTransactionAsync(newTransaction);
+                    await _transactionService!.AddTransactionAsync(newTransaction);
                 }
                 else // Режим редактирования
                 {
@@ -145,7 +147,7 @@ namespace Kopilka.FinanceManager
                     _editingTransaction.Comment = CommentTextBox.Text;
                     _editingTransaction.AccountId = account.Id;
                     _editingTransaction.CategoryId = _selectedCategory.Id;
-                    await _transactionService.UpdateTransactionAsync(_editingTransaction);
+                    await _transactionService!.UpdateTransactionAsync(_editingTransaction);
                 }
                 DialogResult = true;
             }

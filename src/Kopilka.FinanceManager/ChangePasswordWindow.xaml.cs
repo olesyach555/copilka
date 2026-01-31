@@ -6,11 +6,11 @@ namespace Kopilka.FinanceManager
 {
     public partial class ChangePasswordWindow : Window
     {
-        private readonly AuthService _authService;
-        private readonly UserService _userService;
-        private readonly User _currentUser;
+        private readonly AuthService? _authService;
+        private readonly UserService? _userService;
+        private readonly User? _currentUser;
 
-        public ChangePasswordWindow(AuthService authService, UserService userService, User currentUser)
+        public ChangePasswordWindow(AuthService? authService, UserService? userService, User? currentUser)
         {
             InitializeComponent();
             _authService = authService;
@@ -20,6 +20,8 @@ namespace Kopilka.FinanceManager
 
         private async void SavePasswordButton_Click(object sender, RoutedEventArgs e)
         {
+            if (_currentUser == null || _authService == null || _userService == null) return;
+
             // 1. Проверяем старый пароль
             var user = await _authService.LoginAsync(_currentUser.Login, OldPasswordBox.Password);
             if (user == null)
