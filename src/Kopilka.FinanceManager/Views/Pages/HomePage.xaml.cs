@@ -13,9 +13,9 @@ namespace Kopilka.FinanceManager.Views.Pages
     public partial class HomePage : Page
     {
         private readonly User? _currentUser;
-        private readonly TransactionService _transactionService;
+        private readonly TransactionService? _transactionService;
 
-        public HomePage(User? currentUser, TransactionService transactionService)
+        public HomePage(User? currentUser, TransactionService? transactionService)
         {
             InitializeComponent();
             _currentUser = currentUser;
@@ -25,7 +25,7 @@ namespace Kopilka.FinanceManager.Views.Pages
 
         private async void HomePage_Loaded(object sender, RoutedEventArgs e)
         {
-            if (_currentUser == null)
+            if (_currentUser == null || _transactionService == null)
             {
                 TransactionsListView.ItemsSource = null;
                 return;
@@ -45,7 +45,7 @@ namespace Kopilka.FinanceManager.Views.Pages
 
         private void AddExpenseButton_Click(object sender, RoutedEventArgs e)
         {
-            if (_currentUser == null) return;
+            if (_currentUser == null || _transactionService == null) return;
 
             var addTransactionWindow = new AddTransactionWindow(_currentUser, "Expense");
             addTransactionWindow.Owner = Window.GetWindow(this);
@@ -60,7 +60,7 @@ namespace Kopilka.FinanceManager.Views.Pages
 
         private void AddIncomeButton_Click(object sender, RoutedEventArgs e)
         {
-            if (_currentUser == null) return;
+            if (_currentUser == null || _transactionService == null) return;
 
             var addTransactionWindow = new AddTransactionWindow(_currentUser, "Income");
             addTransactionWindow.Owner = Window.GetWindow(this);
@@ -75,7 +75,7 @@ namespace Kopilka.FinanceManager.Views.Pages
 
         private async void DeleteTransaction_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button button && button.Tag is int transactionId)
+            if (sender is Button button && button.Tag is int transactionId && _transactionService != null)
             {
                 var result = MessageBox.Show("Вы уверены, что хотите удалить эту транзакцию?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Warning);
                 if (result == MessageBoxResult.Yes)

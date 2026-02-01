@@ -7,11 +7,11 @@ namespace Kopilka.FinanceManager
 {
     public partial class AddEditCategoryWindow : Window
     {
-        private readonly CategoryService _categoryService;
+        private readonly CategoryService? _categoryService;
         private readonly int _userId;
         private Category? _categoryToEdit; // Поле теперь nullable
 
-        public AddEditCategoryWindow(CategoryService categoryService, int userId, Category? categoryToEdit = null)
+        public AddEditCategoryWindow(CategoryService? categoryService, int userId, Category? categoryToEdit = null)
         {
             InitializeComponent();
             _categoryService = categoryService;
@@ -32,6 +32,7 @@ namespace Kopilka.FinanceManager
 
         private async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
+            if (_categoryService == null) return;
             if (string.IsNullOrWhiteSpace(CategoryNameTextBox.Text))
             {
                 MessageBox.Show("Название категории не может быть пустым.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);

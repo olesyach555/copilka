@@ -6,12 +6,12 @@ namespace Kopilka.FinanceManager
 {
     public partial class AddEditAccountWindow : Window
     {
-        private readonly AccountService _accountService;
+        private readonly AccountService? _accountService;
         private readonly int _userId;
         private Account? _accountToEdit; // Поле теперь nullable
 
         // Конструктор для добавления нового счета
-        public AddEditAccountWindow(AccountService accountService, int userId)
+        public AddEditAccountWindow(AccountService? accountService, int userId)
         {
             InitializeComponent();
             _accountService = accountService;
@@ -20,7 +20,7 @@ namespace Kopilka.FinanceManager
         }
 
         // Конструктор для редактирования существующего счета
-        public AddEditAccountWindow(AccountService accountService, int userId, Account accountToEdit)
+        public AddEditAccountWindow(AccountService? accountService, int userId, Account? accountToEdit)
         {
             InitializeComponent();
             _accountService = accountService;
@@ -29,14 +29,19 @@ namespace Kopilka.FinanceManager
 
             // Заполняем поля данными счета
             WindowTitle.Text = "Редактировать счет";
-            AccountNameTextBox.Text = _accountToEdit.Name;
-            AccountBalanceTextBox.Text = _accountToEdit.Balance.ToString();
+            if (_accountToEdit != null)
+            {
+                AccountNameTextBox.Text = _accountToEdit.Name;
+                AccountBalanceTextBox.Text = _accountToEdit.Balance.ToString();
+            }
             // Включаем редактирование баланса согласно новым требованиям
             AccountBalanceTextBox.IsEnabled = true;
         }
 
         private async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
+            if (_accountService == null) return;
+
             if (string.IsNullOrWhiteSpace(AccountNameTextBox.Text))
             {
                 MessageBox.Show("Имя счета не может быть пустым.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -62,7 +67,7 @@ namespace Kopilka.FinanceManager
                 };
                 await _accountService.AddAccountAsync(newAccount);
             }
-            else // Режим редактирования
+            else if (_accountToEdit != null) // Режим редактирования
             {
                 _accountToEdit.Name = AccountNameTextBox.Text;
                 // Разрешаем прямое изменение баланса
