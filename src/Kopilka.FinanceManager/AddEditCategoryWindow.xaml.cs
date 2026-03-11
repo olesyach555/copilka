@@ -7,11 +7,11 @@ namespace Kopilka.FinanceManager
 {
     public partial class AddEditCategoryWindow : Window
     {
-        private readonly CategoryService _categoryService;
+        private readonly CategoryService? _categoryService;
         private readonly int _userId;
         private Category? _categoryToEdit; // Поле теперь nullable
 
-        public AddEditCategoryWindow(CategoryService categoryService, int userId, Category? categoryToEdit = null)
+        public AddEditCategoryWindow(CategoryService? categoryService, int userId, Category? categoryToEdit = null)
         {
             InitializeComponent();
             _categoryService = categoryService;
@@ -40,21 +40,24 @@ namespace Kopilka.FinanceManager
 
             var categoryType = (CategoryTypeComboBox.SelectedItem as ComboBoxItem)?.Content.ToString() == "Доход" ? "Income" : "Expense";
 
-            if (_categoryToEdit == null)
+            if (_categoryService != null)
             {
-                var newCategory = new Category
+                if (_categoryToEdit == null)
                 {
-                    UserId = _userId,
-                    Name = CategoryNameTextBox.Text,
-                    Type = categoryType
-                };
-                await _categoryService.AddCategoryAsync(newCategory);
-            }
-            else
-            {
-                _categoryToEdit.Name = CategoryNameTextBox.Text;
-                _categoryToEdit.Type = categoryType;
-                await _categoryService.UpdateCategoryAsync(_categoryToEdit);
+                    var newCategory = new Category
+                    {
+                        UserId = _userId,
+                        Name = CategoryNameTextBox.Text,
+                        Type = categoryType
+                    };
+                    await _categoryService.AddCategoryAsync(newCategory);
+                }
+                else
+                {
+                    _categoryToEdit.Name = CategoryNameTextBox.Text;
+                    _categoryToEdit.Type = categoryType;
+                    await _categoryService.UpdateCategoryAsync(_categoryToEdit);
+                }
             }
 
             DialogResult = true;

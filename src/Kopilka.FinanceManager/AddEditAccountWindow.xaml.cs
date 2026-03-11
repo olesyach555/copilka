@@ -6,12 +6,12 @@ namespace Kopilka.FinanceManager
 {
     public partial class AddEditAccountWindow : Window
     {
-        private readonly AccountService _accountService;
+        private readonly AccountService? _accountService;
         private readonly int _userId;
         private Account? _accountToEdit; // Поле теперь nullable
 
         // Конструктор для добавления нового счета
-        public AddEditAccountWindow(AccountService accountService, int userId)
+        public AddEditAccountWindow(AccountService? accountService, int userId)
         {
             InitializeComponent();
             _accountService = accountService;
@@ -20,7 +20,7 @@ namespace Kopilka.FinanceManager
         }
 
         // Конструктор для редактирования существующего счета
-        public AddEditAccountWindow(AccountService accountService, int userId, Account accountToEdit)
+        public AddEditAccountWindow(AccountService? accountService, int userId, Account accountToEdit)
         {
             InitializeComponent();
             _accountService = accountService;
@@ -50,24 +50,27 @@ namespace Kopilka.FinanceManager
                 return;
             }
 
-            if (_accountToEdit == null) // Режим добавления
+            if (_accountService != null)
             {
-                var newAccount = new Account
+                if (_accountToEdit == null) // Режим добавления
                 {
-                    UserId = _userId,
-                    Name = AccountNameTextBox.Text,
-                    Balance = balance,
-                    Type = "Карта", // Устанавливаем значение по умолчанию
-                    Currency = "RUB"   // Устанавливаем значение по умолчанию
-                };
-                await _accountService.AddAccountAsync(newAccount);
-            }
-            else // Режим редактирования
-            {
-                _accountToEdit.Name = AccountNameTextBox.Text;
-                // Разрешаем прямое изменение баланса
-                _accountToEdit.Balance = balance;
-                await _accountService.UpdateAccountAsync(_accountToEdit);
+                    var newAccount = new Account
+                    {
+                        UserId = _userId,
+                        Name = AccountNameTextBox.Text,
+                        Balance = balance,
+                        Type = "Карта", // Устанавливаем значение по умолчанию
+                        Currency = "RUB"   // Устанавливаем значение по умолчанию
+                    };
+                    await _accountService.AddAccountAsync(newAccount);
+                }
+                else // Режим редактирования
+                {
+                    _accountToEdit.Name = AccountNameTextBox.Text;
+                    // Разрешаем прямое изменение баланса
+                    _accountToEdit.Balance = balance;
+                    await _accountService.UpdateAccountAsync(_accountToEdit);
+                }
             }
 
             DialogResult = true;
