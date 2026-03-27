@@ -10,13 +10,13 @@ namespace Kopilka.FinanceManager
 {
     public partial class AddTransactionWindow : Window
     {
-        private readonly TransactionService _transactionService;
-        private readonly KopilkaDbContext _dbContext;
-        private readonly User _currentUser;
+        private readonly TransactionService? _transactionService;
+        private readonly KopilkaDbContext? _dbContext;
+        private readonly User? _currentUser;
         private Category? _selectedCategory;
         private readonly Transaction? _editingTransaction;
 
-        public AddTransactionWindow(User user, string transactionType = "Expense")
+        public AddTransactionWindow(User? user, string transactionType = "Expense")
         {
             InitializeComponent();
             _currentUser = user;
@@ -30,7 +30,7 @@ namespace Kopilka.FinanceManager
             }
         }
 
-        public AddTransactionWindow(User user, Transaction transactionToEdit)
+        public AddTransactionWindow(User? user, Transaction transactionToEdit)
         {
             InitializeComponent();
             _currentUser = user;
@@ -47,7 +47,10 @@ namespace Kopilka.FinanceManager
 
         private void LoadInitialData()
         {
-            AccountComboBox.ItemsSource = _dbContext.Accounts.Where(a => a.UserId == _currentUser.Id).ToList();
+            if (_currentUser != null && _dbContext != null)
+            {
+                AccountComboBox.ItemsSource = _dbContext.Accounts.Where(a => a.UserId == _currentUser.Id).ToList();
+            }
             LoadCategories("Expense");
         }
 
@@ -59,7 +62,7 @@ namespace Kopilka.FinanceManager
             DatePicker.SelectedDate = _editingTransaction.Date;
             CommentTextBox.Text = _editingTransaction.Comment;
 
-            AccountComboBox.SelectedItem = ((System.Collections.Generic.List<Account>)AccountComboBox.ItemsSource)
+            AccountComboBox.SelectedItem = ((System.Collections.Generic.List<Account>)AccountComboBox.ItemsSource)?
                 .FirstOrDefault(a => a.Id == _editingTransaction.AccountId);
 
             if (_editingTransaction.Type == "Income")
@@ -73,12 +76,18 @@ namespace Kopilka.FinanceManager
                 LoadCategories("Expense");
             }
 
-            _selectedCategory = _dbContext.Categories.Find(_editingTransaction.CategoryId);
+            if (_dbContext != null)
+            {
+                _selectedCategory = _dbContext.Categories.Find(_editingTransaction.CategoryId);
+            }
         }
 
         private void LoadCategories(string type)
         {
-            CategoryItemsControl.ItemsSource = _dbContext.Categories.Where(c => c.Type == type).ToList();
+            if (_dbContext != null)
+            {
+                CategoryItemsControl.ItemsSource = _dbContext.Categories.Where(c => c.Type == type).ToList();
+            }
         }
 
         private void TransactionTypeTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -86,7 +95,7 @@ namespace Kopilka.FinanceManager
             if (e.Source is TabControl)
             {
                 var tab = (TabItem)TransactionTypeTabControl.SelectedItem;
-                if (tab.Header.ToString() == "РАСХОДЫ")
+                if (tab.Header?.ToString() == "РАСХОДЫ")
                 {
                     LoadCategories("Expense");
                 }
@@ -121,7 +130,9 @@ namespace Kopilka.FinanceManager
             if (decimal.TryParse(AmountTextBox.Text, out var amount) &&
                 _selectedCategory != null &&
                 AccountComboBox.SelectedItem is Account account &&
-                DatePicker.SelectedDate is DateTime date)
+                DatePicker.SelectedDate is DateTime date &&
+                _currentUser != null &&
+                _transactionService != null)
             {
                 if (_editingTransaction == null) // Режим создания
                 {
