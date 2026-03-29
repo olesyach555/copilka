@@ -1,22 +1,42 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <ItemGroup>
-    <ProjectReference Include="..\Kopilka.Shared\Kopilka.Shared.csproj" />
-    <ProjectReference Include="..\Kopilka.BusinessLogic\Kopilka.BusinessLogic.csproj" />
-    <ProjectReference Include="..\Kopilka.DataAccess\Kopilka.DataAccess.csproj" />
-  </ItemGroup>
-
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
-    <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Kopilka.BusinessLogic\Kopilka.BusinessLogic.csproj" />
+    <ProjectReference Include="..\Kopilka.DataAccess\Kopilka.DataAccess.csproj" />
+    <ProjectReference Include="..\Kopilka.Shared\Kopilka.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml" />
+    <Page Include="AddEditAccountWindow.xaml" />
+    <Page Include="AddEditCategoryWindow.xaml" />
+    <Page Include="AddTransactionWindow.xaml" />
+    <Page Include="ChangePasswordWindow.xaml" />
+    <Page Include="DateFilterWindow.xaml" />
+    <Page Include="LoginWindow.xaml" />
+    <Page Include="MainWindow.xaml" />
+    <Page Include="Styles\Styles.xaml" />
+    <Page Include="Themes\Theme.xaml" />
+    <Page Include="Views\Pages\AccountsPage.xaml" />
+    <Page Include="Views\Pages\CategoriesPage.xaml" />
+    <Page Include="Views\Pages\ChartsPage.xaml" />
+    <Page Include="Views\Pages\HomePage.xaml" />
+    <Page Include="Views\Pages\RegularPaymentsPage.xaml" />
+    <Page Include="Views\Pages\RemindersPage.xaml" />
+    <Page Include="Views\Pages\SettingsPage.xaml" />
+    <Page Include="Views\Pages\WelcomePage.xaml" />
   </ItemGroup>
 
 </Project>
