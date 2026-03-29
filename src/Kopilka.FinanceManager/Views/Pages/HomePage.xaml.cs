@@ -13,9 +13,9 @@ namespace Kopilka.FinanceManager.Views.Pages
     public partial class HomePage : Page
     {
         private readonly User? _currentUser;
-        private readonly TransactionService _transactionService;
+        private readonly TransactionService? _transactionService;
 
-        public HomePage(User? currentUser, TransactionService transactionService)
+        public HomePage(User? currentUser, TransactionService? transactionService)
         {
             InitializeComponent();
             _currentUser = currentUser;
@@ -33,7 +33,7 @@ namespace Kopilka.FinanceManager.Views.Pages
 
             try
             {
-                var transactions = await _transactionService.GetRecentTransactionsAsync(_currentUser.Id, 15);
+                var transactions = await _transactionService!.GetRecentTransactionsAsync(_currentUser.Id, 15);
                 TransactionsListView.ItemsSource = transactions;
             }
             catch (Exception ex)
@@ -82,7 +82,7 @@ namespace Kopilka.FinanceManager.Views.Pages
                 {
                     try
                     {
-                        await _transactionService.DeleteTransactionAsync(transactionId);
+                        await _transactionService!.DeleteTransactionAsync(transactionId);
 
                         // Обновляем UI после удаления
                         HomePage_Loaded(this, new RoutedEventArgs());
