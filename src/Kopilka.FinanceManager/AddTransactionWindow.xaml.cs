@@ -10,13 +10,13 @@ namespace Kopilka.FinanceManager
 {
     public partial class AddTransactionWindow : Window
     {
-        private readonly TransactionService _transactionService;
-        private readonly KopilkaDbContext _dbContext;
-        private readonly User _currentUser;
+        private readonly TransactionService? _transactionService;
+        private readonly KopilkaDbContext? _dbContext;
+        private readonly User? _currentUser;
         private Category? _selectedCategory;
         private readonly Transaction? _editingTransaction;
 
-        public AddTransactionWindow(User user, string transactionType = "Expense")
+        public AddTransactionWindow(User? user, string transactionType = "Expense")
         {
             InitializeComponent();
             _currentUser = user;
@@ -30,7 +30,7 @@ namespace Kopilka.FinanceManager
             }
         }
 
-        public AddTransactionWindow(User user, Transaction transactionToEdit)
+        public AddTransactionWindow(User? user, Transaction transactionToEdit)
         {
             InitializeComponent();
             _currentUser = user;
@@ -47,6 +47,7 @@ namespace Kopilka.FinanceManager
 
         private void LoadInitialData()
         {
+            if (_dbContext == null || _currentUser == null) return;
             AccountComboBox.ItemsSource = _dbContext.Accounts.Where(a => a.UserId == _currentUser.Id).ToList();
             LoadCategories("Expense");
         }
@@ -73,11 +74,15 @@ namespace Kopilka.FinanceManager
                 LoadCategories("Expense");
             }
 
-            _selectedCategory = _dbContext.Categories.Find(_editingTransaction.CategoryId);
+            if (_dbContext != null)
+            {
+                _selectedCategory = _dbContext.Categories.Find(_editingTransaction.CategoryId);
+            }
         }
 
         private void LoadCategories(string type)
         {
+            if (_dbContext == null) return;
             CategoryItemsControl.ItemsSource = _dbContext.Categories.Where(c => c.Type == type).ToList();
         }
 
@@ -121,7 +126,9 @@ namespace Kopilka.FinanceManager
             if (decimal.TryParse(AmountTextBox.Text, out var amount) &&
                 _selectedCategory != null &&
                 AccountComboBox.SelectedItem is Account account &&
-                DatePicker.SelectedDate is DateTime date)
+                DatePicker.SelectedDate is DateTime date &&
+                _currentUser != null &&
+                _transactionService != null)
             {
                 if (_editingTransaction == null) // Режим создания
                 {
