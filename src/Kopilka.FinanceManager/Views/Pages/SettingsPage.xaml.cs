@@ -5,13 +5,13 @@ using System.Windows.Controls;
 
 namespace Kopilka.FinanceManager.Views.Pages
 {
-    public partial class SettingsPage : Page // Изменено с UserControl на Page
+    public partial class SettingsPage : Page
     {
         private readonly UserService? _userService;
         private readonly AuthService? _authService;
         private readonly User? _currentUser;
 
-        public SettingsPage(User currentUser, UserService userService, AuthService authService)
+        public SettingsPage(User? currentUser, UserService? userService, AuthService? authService)
         {
             InitializeComponent();
             _currentUser = currentUser;
