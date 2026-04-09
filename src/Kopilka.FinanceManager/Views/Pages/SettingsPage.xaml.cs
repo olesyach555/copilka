@@ -11,7 +11,7 @@ namespace Kopilka.FinanceManager.Views.Pages
         private readonly AuthService? _authService;
         private readonly User? _currentUser;
 
-        public SettingsPage(User currentUser, UserService userService, AuthService authService)
+        public SettingsPage(User? currentUser, UserService? userService, AuthService? authService)
         {
             InitializeComponent();
             _currentUser = currentUser;

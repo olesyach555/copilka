@@ -8,12 +8,12 @@ namespace Kopilka.FinanceManager
 {
     public partial class App : Application
     {
-        private KopilkaDbContext _dbContext = null!;
-        private AuthService _authService = null!;
-        private TransactionService _transactionService = null!;
-        private AccountService _accountService = null!;
-        private CategoryService _categoryService = null!;
-        private UserService _userService = null!;
+        private KopilkaDbContext? _dbContext;
+        private AuthService? _authService;
+        private TransactionService? _transactionService;
+        private AccountService? _accountService;
+        private CategoryService? _categoryService;
+        private UserService? _userService;
 
         protected override async void OnStartup(StartupEventArgs e)
         {
