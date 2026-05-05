@@ -21,9 +21,19 @@ namespace Kopilka.Shared
         public string PasswordHash { get; set; } = string.Empty;
 
         /// <summary>
-        /// Роль пользователя в системе (например, "Admin" или "User").
+        /// Роль пользователя (Parent / Child).
         /// </summary>
         public string Role { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Идентификатор семьи.
+        /// </summary>
+        public int? FamilyId { get; set; }
+
+        /// <summary>
+        /// Семья, к которой принадлежит пользователь.
+        /// </summary>
+        public Family? Family { get; set; }
 
         /// <summary>
         /// Электронная почта пользователя.

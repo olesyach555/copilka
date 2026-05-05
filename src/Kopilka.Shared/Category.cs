@@ -16,14 +16,9 @@ namespace Kopilka.Shared
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// Тип категории ("Expense" или "Income").
+        /// Тип категории (true – доход, false – расход).
         /// </summary>
-        public string Type { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Описание категории.
-        /// </summary>
-        public string Description { get; set; } = string.Empty;
+        public bool IsIncome { get; set; }
 
         /// <summary>
         /// Идентификатор пользователя, которому принадлежит категория.

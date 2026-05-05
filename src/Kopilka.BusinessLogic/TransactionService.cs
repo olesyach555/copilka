@@ -1,242 +1,89 @@
 using Kopilka.DataAccess;
 using Kopilka.Shared;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Kopilka.BusinessLogic
 {
-    /// <summary>
-    /// Сервис для управления транзакциями.
-    /// </summary>
     public class TransactionService
     {
-        private readonly KopilkaDbContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public TransactionService(KopilkaDbContext context)
+        public TransactionService(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        /// <summary>
-        /// Асинхронно получает список транзакций для пользователя за указанный период.
-        /// </summary>
-        /// <param name="userId">ID пользователя.</param>
-        /// <param name="startDate">Начальная дата периода.</param>
-        /// <param name="endDate">Конечная дата периода.</param>
-        /// <returns>Список транзакций.</returns>
-        public async Task<List<Transaction>> GetTransactionsForUserAsync(int userId, DateTime startDate, DateTime endDate)
+        public async Task<List<Transaction>> GetTransactionsAsync(int userId, DateTime? start = null, DateTime? end = null)
         {
-            var userAccountIds = await _context.Accounts
-                .Where(a => a.UserId == userId)
-                .Select(a => a.Id)
-                .ToListAsync();
-
-            return await _context.Transactions
-                .Where(t => userAccountIds.Contains(t.AccountId))
-                .Where(t => t.Date >= startDate && t.Date <= endDate)
+            var query = _context.Transactions
                 .Include(t => t.Category)
-                .ToListAsync();
+                .Where(t => t.UserId == userId);
+
+            if (start.HasValue)
+                query = query.Where(t => t.Date >= start.Value);
+            if (end.HasValue)
+                query = query.Where(t => t.Date <= end.Value);
+
+            return await query.OrderByDescending(t => t.Date).ToListAsync();
         }
 
-        /// <summary>
-        /// Асинхронно вычисляет общую сумму доходов пользователя за период.
-        /// </summary>
-        public async Task<decimal> GetTotalIncomeAsync(int userId, DateTime startDate, DateTime endDate)
-        {
-            var userAccountIds = await _context.Accounts
-                .Where(a => a.UserId == userId)
-                .Select(a => a.Id)
-                .ToListAsync();
-
-            return (decimal)await _context.Transactions
-                .Where(t => userAccountIds.Contains(t.AccountId) &&
-                            t.Date >= startDate && t.Date <= endDate &&
-                            t.Type == "Income")
-                .SumAsync(t => (double)t.Amount);
-        }
-
-        /// <summary>
-        /// Асинхронно вычисляет общую сумму расходов пользователя за период.
-        /// </summary>
-        public async Task<decimal> GetTotalExpensesAsync(int userId, DateTime startDate, DateTime endDate)
-        {
-            var userAccountIds = await _context.Accounts
-                .Where(a => a.UserId == userId)
-                .Select(a => a.Id)
-                .ToListAsync();
-
-            return (decimal)await _context.Transactions
-                .Where(t => userAccountIds.Contains(t.AccountId) &&
-                            t.Date >= startDate && t.Date <= endDate &&
-                            t.Type == "Expense")
-                .SumAsync(t => (double)t.Amount);
-        }
-
-        /// <summary>
-        /// Асинхронно добавляет новую транзакцию, обновляет баланс и создает запись о дате.
-        /// </summary>
-        /// <param name="transaction">Транзакция для добавления.</param>
         public async Task AddTransactionAsync(Transaction transaction)
         {
-            var account = await _context.Accounts.FindAsync(transaction.AccountId);
-            if (account == null)
-            {
-                throw new ArgumentException("Указанный счет не существует.", nameof(transaction.AccountId));
-            }
-
-            transaction.UserId = account.UserId;
-
-            if (transaction.Type == "Expense")
-            {
-                account.Balance -= transaction.Amount;
-            }
-            else if (transaction.Type == "Income")
-            {
-                account.Balance += transaction.Amount;
-            }
-            _context.Accounts.Update(account);
-
-            await _context.Transactions.AddAsync(transaction);
-
-            var date = new Date
-            {
-                DateTime = transaction.Date,
-                OperationType = $"Добавлена транзакция: {transaction.Amount} {transaction.Type}"
-            };
-            _context.Dates.Add(date);
-
+            _context.Transactions.Add(transaction);
             await _context.SaveChangesAsync();
         }
 
-        /// <summary>
-        /// Асинхронно обновляет существующую транзакцию, корректирует балансы и создает запись о дате.
-        /// </summary>
-        /// <param name="updatedTransaction">Обновленная транзакция.</param>
-        public async Task UpdateTransactionAsync(Transaction updatedTransaction)
+        public async Task UpdateTransactionAsync(Transaction transaction)
         {
-            var originalTransaction = await _context.Transactions
-                .AsNoTracking()
-                .FirstOrDefaultAsync(t => t.Id == updatedTransaction.Id);
-
-            if (originalTransaction == null)
-            {
-                throw new ArgumentException("Транзакция для обновления не найдена.");
-            }
-
-            var originalAccount = await _context.Accounts.FindAsync(originalTransaction.AccountId);
-            if (originalAccount != null)
-            {
-                if (originalTransaction.Type == "Expense")
-                {
-                    originalAccount.Balance += originalTransaction.Amount;
-                }
-                else if (originalTransaction.Type == "Income")
-                {
-                    originalAccount.Balance -= originalTransaction.Amount;
-                }
-                _context.Accounts.Update(originalAccount);
-            }
-
-            var newAccount = await _context.Accounts.FindAsync(updatedTransaction.AccountId);
-            if (newAccount != null)
-            {
-                updatedTransaction.UserId = newAccount.UserId;
-                if (updatedTransaction.Type == "Expense")
-                {
-                    newAccount.Balance -= updatedTransaction.Amount;
-                }
-                else if (updatedTransaction.Type == "Income")
-                {
-                    newAccount.Balance += updatedTransaction.Amount;
-                }
-                _context.Accounts.Update(newAccount);
-            }
-
-            _context.Transactions.Update(updatedTransaction);
-
-            var date = new Date
-            {
-                DateTime = updatedTransaction.Date,
-                OperationType = $"Изменена транзакция: {updatedTransaction.Amount} {updatedTransaction.Type}"
-            };
-            _context.Dates.Add(date);
-
+            _context.Transactions.Update(transaction);
             await _context.SaveChangesAsync();
         }
 
-        /// <summary>
-        /// Асинхронно удаляет транзакцию, корректирует баланс и создает запись о дате.
-        /// </summary>
-        /// <param name="transactionId">ID транзакции для удаления.</param>
-        public async Task DeleteTransactionAsync(int transactionId)
+        public async Task DeleteTransactionAsync(int id)
         {
-            var transaction = await _context.Transactions.FindAsync(transactionId);
-            if (transaction == null)
+            var transaction = await _context.Transactions.FindAsync(id);
+            if (transaction != null)
             {
-                throw new ArgumentException("Транзакция для удаления не найдена.");
+                _context.Transactions.Remove(transaction);
+                await _context.SaveChangesAsync();
             }
-
-            var account = await _context.Accounts.FindAsync(transaction.AccountId);
-            if (account != null)
-            {
-                if (transaction.Type == "Expense")
-                {
-                    account.Balance += transaction.Amount;
-                }
-                else if (transaction.Type == "Income")
-                {
-                    account.Balance -= transaction.Amount;
-                }
-                _context.Accounts.Update(account);
-            }
-
-            _context.Transactions.Remove(transaction);
-
-            var date = new Date
-            {
-                DateTime = transaction.Date,
-                OperationType = $"Удалена транзакция: {transaction.Amount} {transaction.Type}"
-            };
-            _context.Dates.Add(date);
-
-            await _context.SaveChangesAsync();
         }
 
-        /// <summary>
-        /// Асинхронно вычисляет общий баланс для пользователя на основе его счетов.
-        /// </summary>
-        /// <param name="userId">ID пользователя.</param>
-        /// <returns>Общий баланс.</returns>
         public async Task<decimal> GetTotalBalanceAsync(int userId)
         {
-            return (decimal)await _context.Accounts
-                .Where(a => a.UserId == userId)
-                .SumAsync(a => (double)a.Balance);
+            var income = await _context.Transactions
+                .Where(t => t.UserId == userId && t.Category.IsIncome)
+                .SumAsync(t => (double)t.Amount);
+
+            var expense = await _context.Transactions
+                .Where(t => t.UserId == userId && !t.Category.IsIncome)
+                .SumAsync(t => (double)t.Amount);
+
+            return (decimal)(income - expense);
         }
 
-        /// <summary>
-        /// Асинхронно получает список последних транзакций пользователя.
-        /// </summary>
-        /// <param name="userId">ID пользователя.</param>
-        /// <param name="count">Количество транзакций для получения.</param>
-        /// <returns>Список последних транзакций.</returns>
-        public async Task<List<Transaction>> GetRecentTransactionsAsync(int userId, int count)
+        public async Task<List<ChartPoint>> GetChartDataAsync(int userId, DateTime start, DateTime end)
         {
-            var userAccountIds = await _context.Accounts
-                .Where(a => a.UserId == userId)
-                .Select(a => a.Id)
+            var transactions = await _context.Transactions
+                .Include(t => t.Category)
+                .Where(t => t.UserId == userId && t.Date >= start && t.Date <= end)
                 .ToListAsync();
 
-            return await _context.Transactions
-                .Where(t => userAccountIds.Contains(t.AccountId))
-                .OrderByDescending(t => t.Date)
-                .Take(count)
-                .Include(t => t.Category)
-                .Include(t => t.Account)
-                .ToListAsync();
+            return transactions
+                .GroupBy(t => t.Date.Date)
+                .Select(g => new ChartPoint
+                {
+                    Date = g.Key,
+                    Amount = (decimal)g.Sum(t => t.Category.IsIncome ? (double)t.Amount : -(double)t.Amount)
+                })
+                .OrderBy(p => p.Date)
+                .ToList();
         }
+    }
+
+    public class ChartPoint
+    {
+        public DateTime Date { get; set; }
+        public decimal Amount { get; set; }
     }
 }

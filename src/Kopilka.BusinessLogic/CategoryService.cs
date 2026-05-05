@@ -1,63 +1,50 @@
 using Kopilka.DataAccess;
 using Kopilka.Shared;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Kopilka.BusinessLogic
 {
-    /// <summary>
-    /// Сервис для управления категориями транзакций.
-    /// </summary>
     public class CategoryService
     {
-        private readonly KopilkaDbContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public CategoryService(KopilkaDbContext context)
+        public CategoryService(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        /// <summary>
-        /// Асинхронно получает список всех категорий для указанного пользователя.
-        /// </summary>
         public async Task<List<Category>> GetCategoriesAsync(int userId)
         {
             return await _context.Categories
-                .Where(c => c.UserId == userId)
+                .Where(c => c.UserId == userId || c.UserId == 0) // 0 для системных категорий
                 .ToListAsync();
         }
 
-        /// <summary>
-        /// Асинхронно добавляет новую категорию.
-        /// </summary>
         public async Task AddCategoryAsync(Category category)
         {
             _context.Categories.Add(category);
             await _context.SaveChangesAsync();
         }
 
-        /// <summary>
-        /// Асинхронно обновляет существующую категорию.
-        /// </summary>
-        public async Task UpdateCategoryAsync(Category category)
+        public async Task SeedDefaultCategoriesAsync(int userId)
         {
-            _context.Categories.Update(category);
-            await _context.SaveChangesAsync();
-        }
-
-        /// <summary>
-        /// Асинхронно удаляет категорию.
-        /// </summary>
-        public async Task DeleteCategoryAsync(int categoryId)
-        {
-            var category = await _context.Categories.FindAsync(categoryId);
-            if (category != null)
+            var defaults = new List<Category>
             {
-                _context.Categories.Remove(category);
-                await _context.SaveChangesAsync();
+                new Category { Name = "Продукты", IsIncome = false, UserId = userId },
+                new Category { Name = "Зарплата", IsIncome = true, UserId = userId },
+                new Category { Name = "Карманные расходы", IsIncome = false, UserId = userId },
+                new Category { Name = "ЖКУ", IsIncome = false, UserId = userId },
+                new Category { Name = "Транспорт", IsIncome = false, UserId = userId }
+            };
+
+            foreach (var cat in defaults)
+            {
+                if (!await _context.Categories.AnyAsync(c => c.UserId == userId && c.Name == cat.Name))
+                {
+                    _context.Categories.Add(cat);
+                }
             }
+            await _context.SaveChangesAsync();
         }
     }
 }

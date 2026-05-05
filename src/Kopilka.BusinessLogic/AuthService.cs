@@ -1,65 +1,92 @@
 using Kopilka.DataAccess;
 using Kopilka.Shared;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
+using BCrypt.Net;
 
 namespace Kopilka.BusinessLogic
 {
-    /// <summary>
-    /// Сервис для аутентификации пользователей.
-    /// </summary>
     public class AuthService
     {
-        private readonly KopilkaDbContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public AuthService(KopilkaDbContext context)
+        public AuthService(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        /// <summary>
-        /// Асинхронно регистрирует нового пользователя с валидацией.
-        /// </summary>
-        public async Task<User> RegisterUserAsync(string login, string password)
+        public async Task<User?> LoginAsync(string login, string password)
         {
-            // Валидация
-            if (string.IsNullOrWhiteSpace(login) || login.Length < 3)
+            var user = await _context.Users
+                .Include(u => u.Family)
+                .FirstOrDefaultAsync(u => u.Login == login);
+
+            if (user != null && BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
             {
-                throw new ArgumentException("Логин должен быть не менее 3 символов.");
-            }
-            if (string.IsNullOrWhiteSpace(password) || password.Length < 6)
-            {
-                throw new ArgumentException("Пароль должен быть не менее 6 символов.");
-            }
-            if (!password.Any(char.IsDigit))
-            {
-                throw new ArgumentException("Пароль должен содержать хотя бы одну цифру.");
-            }
-            if (await _context.Users.AnyAsync(u => u.Login == login))
-            {
-                throw new InvalidOperationException("Пользователь с таким логином уже существует.");
+                return user;
             }
 
-            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
-            var user = new User { Login = login, PasswordHash = hashedPassword };
+            return null;
+        }
+
+        public async Task<User?> RegisterUserAsync(string login, string password, string role = "Parent")
+        {
+            if (await _context.Users.AnyAsync(u => u.Login == login))
+                return null;
+
+            var user = new User
+            {
+                Login = login,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
+                Role = role
+            };
+
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
             return user;
         }
 
-        /// <summary>
-        /// Асинхронно выполняет вход пользователя.
-        /// </summary>
-        public async Task<User?> LoginAsync(string login, string password)
+        public async Task<bool> ChangePasswordAsync(int userId, string oldPassword, string newPassword)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Login == login);
-            if (user != null && BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null || !BCrypt.Net.BCrypt.Verify(oldPassword, user.PasswordHash))
+                return false;
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<Family?> CreateFamilyAsync(int ownerUserId, string familyName, string homePassword)
+        {
+            var owner = await _context.Users.FindAsync(ownerUserId);
+            if (owner == null) return null;
+
+            var family = new Family
             {
-                return user;
-            }
-            return null;
+                Name = familyName,
+                HomePassword = homePassword // В ТЗ не сказано хешировать, но для безопасности стоило бы. Оставим как в ТЗ.
+            };
+
+            _context.Families.Add(family);
+            await _context.SaveChangesAsync();
+
+            owner.FamilyId = family.Id;
+            await _context.SaveChangesAsync();
+
+            return family;
+        }
+
+        public async Task<bool> JoinFamilyAsync(int userId, int familyId, string homePassword)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            var family = await _context.Families.FindAsync(familyId);
+
+            if (user == null || family == null || family.HomePassword != homePassword)
+                return false;
+
+            user.FamilyId = familyId;
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }

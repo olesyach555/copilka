@@ -13,27 +13,12 @@ namespace Kopilka.Shared
         public int Id { get; set; }
 
         /// <summary>
-        /// Идентификатор счета, к которому относится транзакция.
-        /// </summary>
-        public int AccountId { get; set; }
-
-        /// <summary>
-        /// Идентификатор категории транзакции.
-        /// </summary>
-        public int CategoryId { get; set; }
-
-        /// <summary>
-        /// Тип транзакции (например, "Доход" или "Расход").
-        /// </summary>
-        public string Type { get; set; } = string.Empty;
-
-        /// <summary>
         /// Сумма транзакции.
         /// </summary>
         public decimal Amount { get; set; }
 
         /// <summary>
-        /// Дата и время проведения транзакции.
+        /// Дата проведения транзакции.
         /// </summary>
         public DateTime Date { get; set; }
 
@@ -43,23 +28,33 @@ namespace Kopilka.Shared
         public string Comment { get; set; } = string.Empty;
 
         /// <summary>
+        /// Идентификатор категории транзакции.
+        /// </summary>
+        public int CategoryId { get; set; }
+
+        /// <summary>
+        /// Идентификатор пользователя, совершившего операцию.
+        /// </summary>
+        public int UserId { get; set; }
+
+        /// <summary>
         /// Навигационное свойство для связи с категорией.
         /// </summary>
         public Category Category { get; set; } = null!;
 
         /// <summary>
-        /// Навигационное свойство для связи со счетом.
-        /// </summary>
-        public Account Account { get; set; } = null!;
-
-        /// <summary>
-        /// Идентификатор пользователя, совершившего транзакцию.
-        /// </summary>
-        public int UserId { get; set; }
-
-        /// <summary>
         /// Навигационное свойство для связи с пользователем.
         /// </summary>
         public User User { get; set; } = null!;
+
+        /// <summary>
+        /// Идентификатор счета (сохраняем для обратной совместимости, если потребуется).
+        /// </summary>
+        public int? AccountId { get; set; }
+
+        /// <summary>
+        /// Навигационное свойство для связи со счетом.
+        /// </summary>
+        public Account? Account { get; set; }
     }
 }

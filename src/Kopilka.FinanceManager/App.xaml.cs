@@ -1,43 +1,35 @@
-using Kopilka.BusinessLogic;
-using Kopilka.DataAccess;
-using Kopilka.Shared;
-using Microsoft.EntityFrameworkCore;
 using System.Windows;
+using Kopilka.DataAccess;
+using Kopilka.BusinessLogic;
+using Kopilka.BusinessLogic.ViewModels;
+using Kopilka.Shared;
 
 namespace Kopilka.FinanceManager
 {
     public partial class App : Application
     {
-        private KopilkaDbContext _dbContext = null!;
-        private AuthService _authService = null!;
-        private TransactionService _transactionService = null!;
-        private AccountService _accountService = null!;
-        private CategoryService _categoryService = null!;
-        private UserService _userService = null!;
-
-        protected override async void OnStartup(StartupEventArgs e)
+        private void Application_Startup(object sender, StartupEventArgs e)
         {
-            base.OnStartup(e);
+            var context = new ApplicationDbContext();
+            var authService = new AuthService(context);
+            var transactionService = new TransactionService(context);
+            var debtService = new DebtService(context);
+            var goalService = new GoalService(context);
+            var reminderService = new ReminderService(context);
 
-            _dbContext = new KopilkaDbContext();
-            // Применяем все ожидающие миграции при запуске
-            await _dbContext.Database.MigrateAsync();
+            var authViewModel = new AuthViewModel(authService);
+            var loginWindow = new LoginWindow(authViewModel);
 
-            _transactionService = new TransactionService(_dbContext);
-            _accountService = new AccountService(_dbContext);
-            _categoryService = new CategoryService(_dbContext);
-            _userService = new UserService(_dbContext);
-            _authService = new AuthService(_dbContext);
-
-            var lastUserId = SettingsService.GetLastUserId();
-            User? user = null;
-            if (lastUserId > 0)
+            if (loginWindow.ShowDialog() == true && loginWindow.Tag is User authenticatedUser)
             {
-                user = await _dbContext.Users.FindAsync(lastUserId);
+                var mainViewModel = new MainViewModel(transactionService, debtService, goalService, reminderService, authenticatedUser.Id);
+                var mainWindow = new MainWindow(mainViewModel, authService, transactionService, debtService, goalService, reminderService);
+                mainWindow.Show();
             }
-
-            var mainWindow = new MainWindow(user, _dbContext, _transactionService, _accountService, _categoryService, _userService, _authService);
-            mainWindow.Show();
+            else
+            {
+                Shutdown();
+            }
         }
     }
 }

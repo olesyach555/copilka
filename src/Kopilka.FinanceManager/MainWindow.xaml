@@ -1,82 +1,44 @@
 <Window x:Class="Kopilka.FinanceManager.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Kopilka.FinanceManager"
-        mc:Ignorable="d"
-        Title="Kopilka Finance Manager" Height="720" Width="1280"
-        WindowStartupLocation="CenterScreen">
-
-    <Window.Resources>
-        <!-- Локальный стиль для навигационных кнопок, основанный на глобальном -->
-        <Style x:Key="NavButtonStyle" TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
-            <Setter Property="HorizontalAlignment" Value="Stretch"/>
-            <Setter Property="Background" Value="Transparent"/>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="{StaticResource BgSecondaryDark}"/>
-                </Trigger>
-                 <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="Background" Value="{StaticResource BgAccent}"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-    </Window.Resources>
-
+        xmlns:vm="clr-namespace:Kopilka.BusinessLogic.ViewModels;assembly=Kopilka.BusinessLogic"
+        xmlns:views="clr-namespace:Kopilka.FinanceManager.Views.Pages"
+        Title="Копилка" Height="600" Width="900" WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="250"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <!-- Левая навигационная панель -->
-        <Border Grid.Column="0" Background="{StaticResource BgSecondaryDark}">
-            <StackPanel Margin="10">
+        <!-- Левая панель навигации -->
+        <StackPanel Grid.Column="0" Background="{StaticResource BgSecondaryDarkBrush}">
+            <TextBlock Text="КОПИЛКА" Foreground="White" FontSize="24" FontWeight="Bold" Margin="20" HorizontalAlignment="Center" />
 
-                <!-- Информация о пользователе -->
-                <Button x:Name="UserButton" Click="UserButton_Click" Background="Transparent" BorderBrush="Transparent" HorizontalContentAlignment="Stretch">
-                    <StackPanel Orientation="Horizontal" Margin="10">
-                        <Border CornerRadius="25" Width="50" Height="50" Background="{StaticResource BgAccent}" VerticalAlignment="Center">
-                            <TextBlock x:Name="UserInitialTextBlock" Text="T" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <StackPanel VerticalAlignment="Center" Margin="10,0,0,0">
-                            <TextBlock x:Name="UsernameTextBlock" Text="testuser" FontSize="16" FontWeight="Bold"/>
-                            <TextBlock x:Name="BalanceTextBlock" Text="Остаток: 0,00 ₽" FontSize="14"/>
-                        </StackPanel>
-                    </StackPanel>
-                </Button>
+            <Button Content="Журнал" Style="{StaticResource NavButtonStyle}" Command="{Binding NavigateToTransactionsCommand}" />
+            <Button Content="Долги" Style="{StaticResource NavButtonStyle}" Command="{Binding NavigateToDebtsCommand}" />
+            <Button Content="Цели" Style="{StaticResource NavButtonStyle}" Command="{Binding NavigateToGoalsCommand}" />
+            <Button Content="Напоминания" Style="{StaticResource NavButtonStyle}" Command="{Binding NavigateToRemindersCommand}" />
 
-                <!-- Разделитель -->
-                <Separator Margin="10" Background="{StaticResource BorderColor}"/>
+            <Separator Margin="10" />
+            <Button Content="Выход" Style="{StaticResource NavButtonStyle}" Click="Logout_Click" />
+        </StackPanel>
 
-                <!-- Кнопки добавления транзакций -->
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Button x:Name="AddExpenseButton" Content="Расход" Grid.Column="0" Margin="5" Style="{StaticResource ExpenseIncomeButtonStyle}" Click="AddExpenseButton_Click"/>
-                    <Button x:Name="AddIncomeButton" Content="Доход" Grid.Column="1" Margin="5" Style="{StaticResource ExpenseIncomeButtonStyle}" Click="AddIncomeButton_Click"/>
-                </Grid>
-
-                <!-- Разделитель -->
-                <Separator Margin="10" Background="{StaticResource BorderColor}"/>
-
-                <!-- Кнопки навигации -->
-                <Button x:Name="HomeButton" Content="Главная" Style="{StaticResource NavButtonStyle}" Click="HomeButton_Click"/>
-                <Button x:Name="AccountsButton" Content="Счета" Style="{StaticResource NavButtonStyle}" Click="AccountsButton_Click"/>
-                <Button x:Name="ChartsButton" Content="Графики" Style="{StaticResource NavButtonStyle}" Click="ChartsButton_Click"/>
-                <Button x:Name="CategoriesButton" Content="Категории" Style="{StaticResource NavButtonStyle}" Click="CategoriesButton_Click"/>
-                <Button x:Name="RegularPaymentsButton" Content="Регулярные платежи" Style="{StaticResource NavButtonStyle}" Click="RegularPaymentsButton_Click"/>
-                <Button x:Name="RemindersButton" Content="Напоминания" Style="{StaticResource NavButtonStyle}" Click="RemindersButton_Click"/>
-                <Button x:Name="SettingsButton" Content="Настройки" Style="{StaticResource NavButtonStyle}" Click="SettingsButton_Click"/>
-
-            </StackPanel>
-        </Border>
-
-        <!-- Основная область контента -->
-        <Frame x:Name="MainFrame" Grid.Column="1" NavigationUIVisibility="Hidden"/>
-
+        <!-- Основной контент -->
+        <ContentControl Grid.Column="1" Content="{Binding CurrentViewModel}">
+            <ContentControl.Resources>
+                <DataTemplate DataType="{x:Type vm:TransactionsViewModel}">
+                    <views:TransactionHistoryView />
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:DebtsViewModel}">
+                    <views:DebtsView />
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:GoalsViewModel}">
+                    <views:GoalsView />
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:RemindersViewModel}">
+                    <views:RemindersView />
+                </DataTemplate>
+            </ContentControl.Resources>
+        </ContentControl>
     </Grid>
 </Window>
