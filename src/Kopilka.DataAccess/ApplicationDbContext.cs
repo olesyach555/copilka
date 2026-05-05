@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Kopilka.DataAccess
 {
     /// <summary>
-    /// Контекст базы данных для приложения "Копилка".
+    /// Контекст базы данных для приложения "Копилка" (SQL Server / SSMS).
     /// </summary>
     public class ApplicationDbContext : DbContext
     {
@@ -33,20 +33,24 @@ namespace Kopilka.DataAccess
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlite("Data Source=kopilka.db");
+                // СТРОКА ПОДКЛЮЧЕНИЯ ДЛЯ SQL SERVER
+                // Измените её на вашу строку подключения к SSMS
+                string connectionString = "Server=(localdb)\\mssqllocaldb;Database=KopilkaDB;Trusted_Connection=True;";
+                optionsBuilder.UseSqlServer(connectionString);
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Настройка decimal для SQLite
+            // Настройка точности для decimal (SQL Server требует явного указания или использует 18,2 по умолчанию)
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {
                 var properties = entityType.GetProperties()
                     .Where(p => p.ClrType == typeof(decimal) || p.ClrType == typeof(decimal?));
                 foreach (var property in properties)
                 {
-                    property.SetColumnType("TEXT");
+                    property.SetPrecision(18);
+                    property.SetScale(2);
                 }
             }
 
