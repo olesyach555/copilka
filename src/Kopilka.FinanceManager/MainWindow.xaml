@@ -18,6 +18,7 @@
             <Button Content="Долги" Style="{StaticResource NavButtonStyle}" Command="{Binding NavigateToDebtsCommand}" />
             <Button Content="Цели" Style="{StaticResource NavButtonStyle}" Command="{Binding NavigateToGoalsCommand}" />
             <Button Content="Напоминания" Style="{StaticResource NavButtonStyle}" Command="{Binding NavigateToRemindersCommand}" />
+            <Button Content="Настройки" Style="{StaticResource NavButtonStyle}" Command="{Binding NavigateToSettingsCommand}" />
 
             <Separator Margin="10" />
             <Button Content="Выход" Style="{StaticResource NavButtonStyle}" Click="Logout_Click" />
@@ -37,6 +38,12 @@
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:RemindersViewModel}">
                     <views:RemindersView />
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:ChartViewModel}">
+                    <views:ChartView />
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:FamilySettingsViewModel}">
+                    <views:FamilySettingsView />
                 </DataTemplate>
             </ContentControl.Resources>
         </ContentControl>

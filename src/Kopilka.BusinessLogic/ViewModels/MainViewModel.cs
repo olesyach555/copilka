@@ -22,20 +22,27 @@ namespace Kopilka.BusinessLogic.ViewModels
             _reminderService = reminderService;
             _userId = userId;
 
-            // Set initial view
             NavigateToTransactions();
         }
 
         [RelayCommand]
-        private void NavigateToTransactions()
+        public void NavigateToTransactions()
         {
             var vm = new TransactionsViewModel(_transactionService, _userId);
+            vm.RequestShowChart += (start, end) => NavigateToChart(start, end);
+            _ = vm.LoadDataAsync();
+            CurrentViewModel = vm;
+        }
+
+        private void NavigateToChart(DateTime start, DateTime end)
+        {
+            var vm = new ChartViewModel(_transactionService, _userId, start, end);
             _ = vm.LoadDataAsync();
             CurrentViewModel = vm;
         }
 
         [RelayCommand]
-        private void NavigateToDebts()
+        public void NavigateToDebts()
         {
             var vm = new DebtsViewModel(_debtService, _userId);
             _ = vm.LoadDebtsAsync();
@@ -43,7 +50,7 @@ namespace Kopilka.BusinessLogic.ViewModels
         }
 
         [RelayCommand]
-        private void NavigateToGoals()
+        public void NavigateToGoals()
         {
             var vm = new GoalsViewModel(_goalService, _userId);
             _ = vm.LoadGoalsAsync();
@@ -51,11 +58,17 @@ namespace Kopilka.BusinessLogic.ViewModels
         }
 
         [RelayCommand]
-        private void NavigateToReminders()
+        public void NavigateToReminders()
         {
             var vm = new RemindersViewModel(_reminderService, _userId);
             _ = vm.LoadRemindersAsync();
             CurrentViewModel = vm;
+        }
+
+        [RelayCommand]
+        public void NavigateToSettings()
+        {
+            CurrentViewModel = new FamilySettingsViewModel();
         }
     }
 }

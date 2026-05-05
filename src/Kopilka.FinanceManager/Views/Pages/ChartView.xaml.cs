@@ -1,8 +1,10 @@
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Collections.Generic;
 using Kopilka.BusinessLogic;
+using Kopilka.BusinessLogic.ViewModels;
 
 namespace Kopilka.FinanceManager.Views.Pages
 {
@@ -11,11 +13,27 @@ namespace Kopilka.FinanceManager.Views.Pages
         public ChartView()
         {
             InitializeComponent();
+            this.DataContextChanged += ChartView_DataContextChanged;
         }
 
-        // В реальном приложении данные приходили бы через Binding,
-        // и мы бы рисовали при изменении данных.
-        // Здесь - упрощенный пример рисования.
+        private void ChartView_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (e.NewValue is ChartViewModel vm)
+            {
+                vm.PropertyChanged += (s, args) =>
+                {
+                    if (args.PropertyName == nameof(ChartViewModel.ChartPoints))
+                    {
+                        DrawChart(vm.ChartPoints);
+                    }
+                };
+                if (vm.ChartPoints?.Count > 0)
+                {
+                    DrawChart(vm.ChartPoints);
+                }
+            }
+        }
+
         public void DrawChart(List<ChartPoint> points)
         {
             ChartCanvas.Children.Clear();
@@ -23,6 +41,14 @@ namespace Kopilka.FinanceManager.Views.Pages
 
             double width = ChartCanvas.ActualWidth;
             double height = ChartCanvas.ActualHeight;
+
+            // Если размеры еще не определены, подождем загрузки
+            if (width == 0 || height == 0)
+            {
+                this.Loaded += (s, e) => DrawChart(points);
+                return;
+            }
+
             double barWidth = (width / points.Count) * 0.8;
             double maxAmount = 0;
             foreach (var p in points) maxAmount = Math.Max(maxAmount, (double)Math.Abs(p.Amount));
@@ -35,7 +61,8 @@ namespace Kopilka.FinanceManager.Views.Pages
                 {
                     Width = barWidth,
                     Height = barHeight,
-                    Fill = points[i].Amount >= 0 ? Brushes.Green : Brushes.Red
+                    Fill = points[i].Amount >= 0 ? Brushes.Green : Brushes.Red,
+                    ToolTip = $"{points[i].Date:dd.MM.yyyy}: {points[i].Amount}"
                 };
 
                 Canvas.SetLeft(rect, i * (width / points.Count) + (width / points.Count - barWidth) / 2);
@@ -47,7 +74,6 @@ namespace Kopilka.FinanceManager.Views.Pages
                 ChartCanvas.Children.Add(rect);
             }
 
-            // Осевая линия
             var line = new Line
             {
                 X1 = 0, Y1 = height / 2,

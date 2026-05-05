@@ -22,6 +22,8 @@ namespace Kopilka.BusinessLogic.ViewModels
         [ObservableProperty]
         private DateTime _endDate = DateTime.Now;
 
+        public event Action<DateTime, DateTime>? RequestShowChart;
+
         public TransactionsViewModel(TransactionService transactionService, int userId)
         {
             _transactionService = transactionService;
@@ -39,7 +41,7 @@ namespace Kopilka.BusinessLogic.ViewModels
         [RelayCommand]
         private void ShowChart()
         {
-            // Логика перехода к графику
+            RequestShowChart?.Invoke(StartDate, EndDate);
         }
     }
 }
