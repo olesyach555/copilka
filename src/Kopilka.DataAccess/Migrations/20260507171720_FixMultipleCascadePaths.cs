@@ -11,8 +11,20 @@ namespace Kopilka.DataAccess.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
+                name: "FK_Reminders_Users_UserId",
+                table: "Reminders");
+
+            migrationBuilder.DropForeignKey(
                 name: "FK_Transactions_Users_UserId",
                 table: "Transactions");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Reminders_Users_UserId",
+                table: "Reminders",
+                column: "UserId",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Transactions_Users_UserId",
@@ -27,8 +39,20 @@ namespace Kopilka.DataAccess.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
+                name: "FK_Reminders_Users_UserId",
+                table: "Reminders");
+
+            migrationBuilder.DropForeignKey(
                 name: "FK_Transactions_Users_UserId",
                 table: "Transactions");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Reminders_Users_UserId",
+                table: "Reminders",
+                column: "UserId",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Transactions_Users_UserId",

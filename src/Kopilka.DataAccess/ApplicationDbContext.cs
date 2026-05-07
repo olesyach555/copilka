@@ -96,7 +96,8 @@ namespace Kopilka.DataAccess
             modelBuilder.Entity<Reminder>()
                 .HasOne(r => r.User)
                 .WithMany()
-                .HasForeignKey(r => r.UserId);
+                .HasForeignKey(r => r.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<UserSettings>()
                 .HasOne(s => s.User)
