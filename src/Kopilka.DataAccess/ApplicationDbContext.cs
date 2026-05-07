@@ -69,7 +69,8 @@ namespace Kopilka.DataAccess
             modelBuilder.Entity<Transaction>()
                 .HasOne(t => t.User)
                 .WithMany()
-                .HasForeignKey(t => t.UserId);
+                .HasForeignKey(t => t.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<DebtContract>()
                 .HasOne(d => d.User)
