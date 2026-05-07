@@ -14,8 +14,6 @@ namespace Kopilka.FinanceManager
         private readonly GoalService _goalService;
         private readonly ReminderService _reminderService;
 
-        private User? _currentUser;
-
         public MainWindow(MainViewModel viewModel,
                           AuthService authService,
                           TransactionService transactionService,
@@ -38,7 +36,6 @@ namespace Kopilka.FinanceManager
 
         private void Logout_Click(object sender, RoutedEventArgs e)
         {
-            _currentUser = null;
             // Перейти на страницу входа
         }
     }
