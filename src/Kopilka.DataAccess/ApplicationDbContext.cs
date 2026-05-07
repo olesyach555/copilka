@@ -54,55 +54,24 @@ namespace Kopilka.DataAccess
                 }
             }
 
-            // Связи и каскадное удаление
+            // Глобальное отключение каскадного удаления для предотвращения циклов в SQL Server
+            foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
+            {
+                relationship.DeleteBehavior = DeleteBehavior.Restrict;
+            }
+
+            // Исключения, где каскад оправдан и не создает циклов
             modelBuilder.Entity<User>()
                 .HasOne(u => u.Family)
                 .WithMany(f => f.Users)
                 .HasForeignKey(u => u.FamilyId)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            modelBuilder.Entity<Transaction>()
-                .HasOne(t => t.Category)
-                .WithMany()
-                .HasForeignKey(t => t.CategoryId);
-
-            modelBuilder.Entity<Transaction>()
-                .HasOne(t => t.User)
-                .WithMany()
-                .HasForeignKey(t => t.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<DebtContract>()
-                .HasOne(d => d.User)
-                .WithMany()
-                .HasForeignKey(d => d.UserId);
-
             modelBuilder.Entity<PaymentSchedule>()
                 .HasOne(p => p.DebtContract)
                 .WithMany()
                 .HasForeignKey(p => p.DebtContractId)
                 .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<PaymentHistory>()
-                .HasOne(ph => ph.DebtContract)
-                .WithMany()
-                .HasForeignKey(ph => ph.DebtContractId);
-
-            modelBuilder.Entity<FinancialGoal>()
-                .HasOne(g => g.OwnerUser)
-                .WithMany()
-                .HasForeignKey(g => g.OwnerUserId);
-
-            modelBuilder.Entity<Reminder>()
-                .HasOne(r => r.User)
-                .WithMany()
-                .HasForeignKey(r => r.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<UserSettings>()
-                .HasOne(s => s.User)
-                .WithMany()
-                .HasForeignKey(s => s.UserId);
         }
     }
 }

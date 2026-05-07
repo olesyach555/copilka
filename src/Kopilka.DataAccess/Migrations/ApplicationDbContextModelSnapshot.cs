@@ -392,7 +392,7 @@ namespace Kopilka.DataAccess.Migrations
                     b.HasOne("Kopilka.Shared.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -403,7 +403,7 @@ namespace Kopilka.DataAccess.Migrations
                     b.HasOne("Kopilka.Shared.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -414,7 +414,7 @@ namespace Kopilka.DataAccess.Migrations
                     b.HasOne("Kopilka.Shared.User", "OwnerUser")
                         .WithMany()
                         .HasForeignKey("OwnerUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("OwnerUser");
@@ -425,7 +425,7 @@ namespace Kopilka.DataAccess.Migrations
                     b.HasOne("Kopilka.Shared.DebtContract", "DebtContract")
                         .WithMany()
                         .HasForeignKey("DebtContractId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("DebtContract");
@@ -446,7 +446,8 @@ namespace Kopilka.DataAccess.Migrations
                 {
                     b.HasOne("Kopilka.Shared.Category", "TransactionCategory")
                         .WithMany()
-                        .HasForeignKey("TransactionCategoryId");
+                        .HasForeignKey("TransactionCategoryId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Kopilka.Shared.User", "User")
                         .WithMany()
@@ -463,12 +464,13 @@ namespace Kopilka.DataAccess.Migrations
                 {
                     b.HasOne("Kopilka.Shared.Account", "Account")
                         .WithMany()
-                        .HasForeignKey("AccountId");
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Kopilka.Shared.Category", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Kopilka.Shared.User", "User")
@@ -499,7 +501,7 @@ namespace Kopilka.DataAccess.Migrations
                     b.HasOne("Kopilka.Shared.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("User");
