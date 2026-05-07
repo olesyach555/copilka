@@ -1,14 +1,13 @@
 /*
 ==============================================================================
 ПОЛНЫЙ SQL-СКРИПТ ДЛЯ СОЗДАНИЯ БАЗЫ ДАННЫХ KOPILKA + ДОПОЛНИТЕЛЬНЫЕ ТАБЛИЦЫ
-Подходит для Microsoft SQL Server 2016 и выше.
+Версия 1.1: Исправлена ошибка множественных каскадных путей (Error 1785)
 ==============================================================================
 */
 
 USE [master];
 GO
 
--- Создание базы данных (если не существует)
 IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = N'KopilkaDB')
 BEGIN
     CREATE DATABASE [KopilkaDB];
@@ -18,7 +17,7 @@ GO
 USE [KopilkaDB];
 GO
 
--- Удаление таблиц в обратном порядке связей для возможности перезапуска скрипта
+-- Удаление в обратном порядке
 IF OBJECT_ID('[MaterialSupplier]', 'U') IS NOT NULL DROP TABLE [MaterialSupplier];
 IF OBJECT_ID('[Material]', 'U') IS NOT NULL DROP TABLE [Material];
 IF OBJECT_ID('[MaterialType]', 'U') IS NOT NULL DROP TABLE [MaterialType];
@@ -37,15 +36,10 @@ IF OBJECT_ID('[UserSettings]', 'U') IS NOT NULL DROP TABLE [UserSettings];
 IF OBJECT_ID('[Accounts]', 'U') IS NOT NULL DROP TABLE [Accounts];
 IF OBJECT_ID('[Users]', 'U') IS NOT NULL DROP TABLE [Users];
 IF OBJECT_ID('[Families]', 'U') IS NOT NULL DROP TABLE [Families];
-IF OBJECT_ID('[Dates]', 'U') IS NOT NULL DROP TABLE [Dates];
-IF OBJECT_ID('[__EFMigrationsHistory]', 'U') IS NOT NULL DROP TABLE [__EFMigrationsHistory];
 GO
 
-/* --------------------------------------------------------------------------
-   ЧАСТЬ 1: СТРУКТУРА ПРОЕКТА KOPILKA
-   -------------------------------------------------------------------------- */
+/* ЧАСТЬ 1: KOPILKA */
 
--- 1. Семьи
 CREATE TABLE [Families] (
     [Id] INT IDENTITY(1,1) NOT NULL,
     [Name] NVARCHAR(255) NOT NULL,
@@ -53,7 +47,6 @@ CREATE TABLE [Families] (
     CONSTRAINT [PK_Families] PRIMARY KEY ([Id])
 );
 
--- 2. Пользователи
 CREATE TABLE [Users] (
     [Id] INT IDENTITY(1,1) NOT NULL,
     [Login] NVARCHAR(100) NOT NULL,
@@ -65,7 +58,6 @@ CREATE TABLE [Users] (
     CONSTRAINT [FK_Users_Families_FamilyId] FOREIGN KEY ([FamilyId]) REFERENCES [Families]([Id]) ON DELETE SET NULL
 );
 
--- 3. Счета
 CREATE TABLE [Accounts] (
     [Id] INT IDENTITY(1,1) NOT NULL,
     [UserId] INT NOT NULL,
@@ -77,7 +69,6 @@ CREATE TABLE [Accounts] (
     CONSTRAINT [FK_Accounts_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users]([Id]) ON DELETE CASCADE
 );
 
--- 4. Категории
 CREATE TABLE [Categories] (
     [Id] INT IDENTITY(1,1) NOT NULL,
     [Name] NVARCHAR(255) NOT NULL,
@@ -87,7 +78,6 @@ CREATE TABLE [Categories] (
     CONSTRAINT [FK_Categories_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users]([Id]) ON DELETE CASCADE
 );
 
--- 5. Транзакции
 CREATE TABLE [Transactions] (
     [Id] INT IDENTITY(1,1) NOT NULL,
     [Amount] DECIMAL(18, 2) NOT NULL,
@@ -98,17 +88,17 @@ CREATE TABLE [Transactions] (
     [AccountId] INT NULL,
     CONSTRAINT [PK_Transactions] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_Transactions_Categories_CategoryId] FOREIGN KEY ([CategoryId]) REFERENCES [Categories]([Id]) ON DELETE CASCADE,
-    CONSTRAINT [FK_Transactions_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users]([Id]) ON DELETE CASCADE,
+    -- Исправлено: ON DELETE NO ACTION для предотвращения циклов (Error 1785)
+    CONSTRAINT [FK_Transactions_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users]([Id]) ON DELETE NO ACTION,
     CONSTRAINT [FK_Transactions_Accounts_AccountId] FOREIGN KEY ([AccountId]) REFERENCES [Accounts]([Id])
 );
 
--- 6. Договоры займа
 CREATE TABLE [DebtContracts] (
     [Id] INT IDENTITY(1,1) NOT NULL,
     [Title] NVARCHAR(255) NOT NULL,
     [Principal] DECIMAL(18, 2) NOT NULL,
-    [InterestRate] DECIMAL(5, 2) NOT NULL,
-    [PenaltyRate] DECIMAL(5, 2) NOT NULL,
+    [InterestRate] DECIMAL(18, 2) NOT NULL,
+    [PenaltyRate] DECIMAL(18, 2) NOT NULL,
     [StartDate] DATETIME2 NOT NULL,
     [EndDate] DATETIME2 NULL,
     [Counterparty] NVARCHAR(255) NOT NULL,
@@ -117,7 +107,6 @@ CREATE TABLE [DebtContracts] (
     CONSTRAINT [FK_DebtContracts_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users]([Id]) ON DELETE CASCADE
 );
 
--- 7. График платежей
 CREATE TABLE [PaymentSchedules] (
     [Id] INT IDENTITY(1,1) NOT NULL,
     [DebtContractId] INT NOT NULL,
@@ -129,18 +118,6 @@ CREATE TABLE [PaymentSchedules] (
     CONSTRAINT [FK_PaymentSchedules_DebtContracts_DebtContractId] FOREIGN KEY ([DebtContractId]) REFERENCES [DebtContracts]([Id]) ON DELETE CASCADE
 );
 
--- 8. История платежей
-CREATE TABLE [PaymentHistories] (
-    [Id] INT IDENTITY(1,1) NOT NULL,
-    [DebtContractId] INT NOT NULL,
-    [Date] DATETIME2 NOT NULL,
-    [Amount] DECIMAL(18, 2) NOT NULL,
-    [Note] NVARCHAR(MAX) NOT NULL,
-    CONSTRAINT [PK_PaymentHistories] PRIMARY KEY ([Id]),
-    CONSTRAINT [FK_PaymentHistories_DebtContracts_DebtContractId] FOREIGN KEY ([DebtContractId]) REFERENCES [DebtContracts]([Id]) ON DELETE CASCADE
-);
-
--- 9. Финансовые цели
 CREATE TABLE [FinancialGoals] (
     [Id] INT IDENTITY(1,1) NOT NULL,
     [Name] NVARCHAR(255) NOT NULL,
@@ -153,7 +130,6 @@ CREATE TABLE [FinancialGoals] (
     CONSTRAINT [FK_FinancialGoals_Users_OwnerUserId] FOREIGN KEY ([OwnerUserId]) REFERENCES [Users]([Id]) ON DELETE CASCADE
 );
 
--- 10. Напоминания
 CREATE TABLE [Reminders] (
     [Id] INT IDENTITY(1,1) NOT NULL,
     [Title] NVARCHAR(255) NOT NULL,
@@ -163,10 +139,10 @@ CREATE TABLE [Reminders] (
     [UserId] INT NOT NULL,
     CONSTRAINT [PK_Reminders] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_Reminders_Categories_TransactionCategoryId] FOREIGN KEY ([TransactionCategoryId]) REFERENCES [Categories]([Id]) ON DELETE SET NULL,
-    CONSTRAINT [FK_Reminders_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users]([Id]) ON DELETE CASCADE
+    -- Исправлено: ON DELETE NO ACTION для предотвращения циклов
+    CONSTRAINT [FK_Reminders_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users]([Id]) ON DELETE NO ACTION
 );
 
--- 11. Настройки пользователя
 CREATE TABLE [UserSettings] (
     [Id] INT IDENTITY(1,1) NOT NULL,
     [UserId] INT NOT NULL,
@@ -175,25 +151,20 @@ CREATE TABLE [UserSettings] (
     CONSTRAINT [FK_UserSettings_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users]([Id]) ON DELETE CASCADE
 );
 
-/* --------------------------------------------------------------------------
-   ЧАСТЬ 2: НОВЫЕ ТАБЛИЦЫ ПО СХЕМЕ (МАТЕРИАЛЫ И ПОСТАВЩИКИ)
-   -------------------------------------------------------------------------- */
+/* ЧАСТЬ 2: ПРОИЗВОДСТВО */
 
--- 12. Типы продукции
 CREATE TABLE [ProductType] (
     [ID] INT IDENTITY(1,1) NOT NULL,
     [Title] NVARCHAR(100) NOT NULL,
     CONSTRAINT [PK_ProductType] PRIMARY KEY ([ID])
 );
 
--- 13. Типы поставщиков
 CREATE TABLE [SupplierType] (
     [ID] INT IDENTITY(1,1) NOT NULL,
     [Title] NVARCHAR(100) NOT NULL,
     CONSTRAINT [PK_SupplierType] PRIMARY KEY ([ID])
 );
 
--- 14. Поставщики
 CREATE TABLE [Supplier] (
     [ID] INT IDENTITY(1,1) NOT NULL,
     [Title] NVARCHAR(255) NOT NULL,
@@ -206,14 +177,12 @@ CREATE TABLE [Supplier] (
     CONSTRAINT [FK_Supplier_SupplierType] FOREIGN KEY ([SupplierTypeID]) REFERENCES [SupplierType]([ID])
 );
 
--- 15. Типы материалов
 CREATE TABLE [MaterialType] (
     [ID] INT IDENTITY(1,1) NOT NULL,
     [Title] NVARCHAR(100) NOT NULL,
     CONSTRAINT [PK_MaterialType] PRIMARY KEY ([ID])
 );
 
--- 16. Материалы
 CREATE TABLE [Material] (
     [ID] INT IDENTITY(1,1) NOT NULL,
     [Title] NVARCHAR(255) NOT NULL,
@@ -229,7 +198,6 @@ CREATE TABLE [Material] (
     CONSTRAINT [FK_Material_MaterialType] FOREIGN KEY ([MaterialTypeID]) REFERENCES [MaterialType]([ID])
 );
 
--- 17. Поставщики материалов (Связь многие-ко-многим)
 CREATE TABLE [MaterialSupplier] (
     [MaterialID] INT NOT NULL,
     [SupplierID] INT NOT NULL,
@@ -239,11 +207,5 @@ CREATE TABLE [MaterialSupplier] (
 );
 GO
 
--- Индексы для оптимизации Kopilka
-CREATE INDEX [IX_Users_Login] ON [Users]([Login]);
-CREATE INDEX [IX_Transactions_Date] ON [Transactions]([Date]);
-CREATE INDEX [IX_Reminders_Date] ON [Reminders]([ReminderDate]);
-GO
-
-PRINT 'База данных успешно создана и настроена.';
+PRINT 'База данных успешно создана без конфликтов путей удаления.';
 GO
