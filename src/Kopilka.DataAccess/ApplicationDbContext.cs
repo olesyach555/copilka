@@ -70,7 +70,7 @@ namespace Kopilka.DataAccess
                 .HasOne(t => t.User)
                 .WithMany()
                 .HasForeignKey(t => t.UserId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<DebtContract>()
                 .HasOne(d => d.User)
@@ -97,7 +97,7 @@ namespace Kopilka.DataAccess
                 .HasOne(r => r.User)
                 .WithMany()
                 .HasForeignKey(r => r.UserId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<UserSettings>()
                 .HasOne(s => s.User)

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Kopilka.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260507171720_FixMultipleCascadePaths")]
+    [Migration("20260507174325_FixMultipleCascadePaths")]
     partial class FixMultipleCascadePaths
     {
         /// <inheritdoc />
@@ -454,7 +454,7 @@ namespace Kopilka.DataAccess.Migrations
                     b.HasOne("Kopilka.Shared.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("TransactionCategory");
@@ -477,7 +477,7 @@ namespace Kopilka.DataAccess.Migrations
                     b.HasOne("Kopilka.Shared.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Account");
