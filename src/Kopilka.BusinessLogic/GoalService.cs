@@ -18,14 +18,9 @@ namespace Kopilka.BusinessLogic
             var user = await _context.Users.FindAsync(userId);
             if (user == null) return new List<FinancialGoal>();
 
-            var query = _context.FinancialGoals.Where(g => g.OwnerUserId == userId);
-
-            if (user.FamilyId.HasValue)
-            {
-                query = _context.FinancialGoals.Where(g => g.OwnerUserId == userId || (g.IsFamilyGoal && g.OwnerUser.FamilyId == user.FamilyId));
-            }
-
-            return await query.ToListAsync();
+            return await _context.FinancialGoals
+                .Where(g => g.OwnerUserId == userId || (g.IsFamilyGoal && g.OwnerUser.FamilyId == user.FamilyId))
+                .ToListAsync();
         }
 
         public async Task AddGoalAsync(FinancialGoal goal)
@@ -34,40 +29,50 @@ namespace Kopilka.BusinessLogic
             await _context.SaveChangesAsync();
         }
 
-        public async Task AddFundsAsync(int goalId, decimal amount)
+        public async Task UpdateGoalAsync(FinancialGoal goal)
         {
-            var goal = await _context.FinancialGoals.FindAsync(goalId);
-            if (goal == null) return;
-
-            goal.CurrentAmount += amount;
+            _context.Entry(goal).State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }
 
-        /// <summary>
-        /// Сценарий "что если" - расчет ежемесячного взноса для достижения цели к дате.
-        /// </summary>
-        public decimal CalculateWhatIfSavings(decimal targetAmount, decimal currentAmount, DateTime targetDate)
+        public async Task DeleteGoalAsync(int id)
         {
-            var remaining = targetAmount - currentAmount;
-            if (remaining <= 0) return 0;
-
-            var months = ((targetDate.Year - DateTime.Now.Year) * 12) + targetDate.Month - DateTime.Now.Month;
-            if (months <= 0) return remaining;
-
-            return remaining / months;
+            var goal = await _context.FinancialGoals.FindAsync(id);
+            if (goal != null)
+            {
+                _context.FinancialGoals.Remove(goal);
+                await _context.SaveChangesAsync();
+            }
         }
 
-        /// <summary>
-        /// Сценарий "что если" - расчет даты достижения цели при фиксированном ежемесячном взносе.
-        /// </summary>
-        public DateTime CalculateWhatIfDate(decimal targetAmount, decimal currentAmount, decimal monthlyContribution)
+        public async Task AddFundsAsync(int goalId, decimal amount, int userId)
         {
-            if (monthlyContribution <= 0) return DateTime.MaxValue;
-            var remaining = targetAmount - currentAmount;
-            if (remaining <= 0) return DateTime.Now;
+            var goal = await _context.FinancialGoals.FindAsync(goalId);
+            if (goal != null)
+            {
+                goal.CurrentAmount += amount;
+                await _context.SaveChangesAsync();
 
-            int months = (int)Math.Ceiling(remaining / monthlyContribution);
-            return DateTime.Now.AddMonths(months);
+                // Создаем транзакцию расхода (перевод в копилку)
+                var category = await _context.Categories.FirstOrDefaultAsync(c => c.Name == "Копилка" && c.UserId == userId);
+                if (category == null)
+                {
+                    category = new Category { Name = "Копилка", IsIncome = false, UserId = userId };
+                    _context.Categories.Add(category);
+                    await _context.SaveChangesAsync();
+                }
+
+                var transaction = new Transaction
+                {
+                    UserId = userId,
+                    Amount = amount,
+                    Date = DateTime.Now,
+                    Comment = $"Пополнение цели: {goal.Name}",
+                    CategoryId = category.Id
+                };
+                _context.Transactions.Add(transaction);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

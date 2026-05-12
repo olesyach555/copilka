@@ -4,22 +4,20 @@ using Microsoft.EntityFrameworkCore;
 namespace Kopilka.DataAccess
 {
     /// <summary>
-    /// Контекст базы данных для приложения "Копилка" (SQL Server / SSMS).
+    /// Контекст базы данных для приложения "Копилка" (SQLite).
     /// </summary>
     public class ApplicationDbContext : DbContext
     {
-        public DbSet<User> Users { get; set; }
-        public DbSet<Family> Families { get; set; }
-        public DbSet<Category> Categories { get; set; }
-        public DbSet<Transaction> Transactions { get; set; }
-        public DbSet<DebtContract> DebtContracts { get; set; }
-        public DbSet<PaymentSchedule> PaymentSchedules { get; set; }
-        public DbSet<PaymentHistory> PaymentHistories { get; set; }
-        public DbSet<FinancialGoal> FinancialGoals { get; set; }
-        public DbSet<Reminder> Reminders { get; set; }
-        public DbSet<UserSettings> UserSettings { get; set; }
-        public DbSet<Account> Accounts { get; set; }
-        public DbSet<Date> Dates { get; set; }
+        public DbSet<User> Users { get; set; } = null!;
+        public DbSet<Family> Families { get; set; } = null!;
+        public DbSet<Category> Categories { get; set; } = null!;
+        public DbSet<Transaction> Transactions { get; set; } = null!;
+        public DbSet<DebtContract> DebtContracts { get; set; } = null!;
+        public DbSet<PaymentSchedule> PaymentSchedules { get; set; } = null!;
+        public DbSet<PaymentHistory> PaymentHistories { get; set; } = null!;
+        public DbSet<FinancialGoal> FinancialGoals { get; set; } = null!;
+        public DbSet<Reminder> Reminders { get; set; } = null!;
+        public DbSet<UserSettings> UserSettings { get; set; } = null!;
 
         public ApplicationDbContext()
         {
@@ -33,16 +31,13 @@ namespace Kopilka.DataAccess
         {
             if (!optionsBuilder.IsConfigured)
             {
-                // СТРОКА ПОДКЛЮЧЕНИЯ ДЛЯ SQL SERVER
-                // Измените её на вашу строку подключения к SSMS
-                string connectionString = "Server=(localdb)\\mssqllocaldb;Database=KopilkaDB;Trusted_Connection=True;";
-                optionsBuilder.UseSqlServer(connectionString);
+                optionsBuilder.UseSqlite("Data Source=kopilka.db");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Настройка точности для decimal (SQL Server требует явного указания или использует 18,2 по умолчанию)
+            // Настройка точности для decimal (в SQLite они мапятся в TEXT или REAL)
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {
                 var properties = entityType.GetProperties()
@@ -54,13 +49,13 @@ namespace Kopilka.DataAccess
                 }
             }
 
-            // Глобальное отключение каскадного удаления для предотвращения циклов в SQL Server
+            // Глобальное отключение каскадного удаления (для SQLite это менее критично, чем для SQL Server, но полезно для консистентности)
             foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
             {
                 relationship.DeleteBehavior = DeleteBehavior.Restrict;
             }
 
-            // Исключения, где каскад оправдан и не создает циклов
+            // Настройка связей
             modelBuilder.Entity<User>()
                 .HasOne(u => u.Family)
                 .WithMany(f => f.Users)
@@ -72,6 +67,18 @@ namespace Kopilka.DataAccess
                 .WithMany()
                 .HasForeignKey(p => p.DebtContractId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Transaction>()
+                .HasOne(t => t.Category)
+                .WithMany()
+                .HasForeignKey(t => t.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Transaction>()
+                .HasOne(t => t.User)
+                .WithMany()
+                .HasForeignKey(t => t.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

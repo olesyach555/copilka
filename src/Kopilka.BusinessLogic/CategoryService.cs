@@ -16,7 +16,8 @@ namespace Kopilka.BusinessLogic
         public async Task<List<Category>> GetCategoriesAsync(int userId)
         {
             return await _context.Categories
-                .Where(c => c.UserId == userId || c.UserId == 0) // 0 для системных категорий
+                .Where(c => c.UserId == userId || c.UserId == 0) // 0 для системных категорий, если есть
+                .OrderBy(c => c.Name)
                 .ToListAsync();
         }
 
@@ -26,25 +27,14 @@ namespace Kopilka.BusinessLogic
             await _context.SaveChangesAsync();
         }
 
-        public async Task SeedDefaultCategoriesAsync(int userId)
+        public async Task DeleteCategoryAsync(int id)
         {
-            var defaults = new List<Category>
+            var category = await _context.Categories.FindAsync(id);
+            if (category != null)
             {
-                new Category { Name = "Продукты", IsIncome = false, UserId = userId },
-                new Category { Name = "Зарплата", IsIncome = true, UserId = userId },
-                new Category { Name = "Карманные расходы", IsIncome = false, UserId = userId },
-                new Category { Name = "ЖКУ", IsIncome = false, UserId = userId },
-                new Category { Name = "Транспорт", IsIncome = false, UserId = userId }
-            };
-
-            foreach (var cat in defaults)
-            {
-                if (!await _context.Categories.AnyAsync(c => c.UserId == userId && c.Name == cat.Name))
-                {
-                    _context.Categories.Add(cat);
-                }
+                _context.Categories.Remove(category);
+                await _context.SaveChangesAsync();
             }
-            await _context.SaveChangesAsync();
         }
     }
 }

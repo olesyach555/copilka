@@ -3,18 +3,47 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              Background="Transparent">
     <Grid Margin="20">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <TextBlock Text="Долги и кредиты" FontSize="20" FontWeight="Bold" Margin="0,0,0,20" />
-        <DataGrid Grid.Row="1" ItemsSource="{Binding Debts}" AutoGenerateColumns="False" IsReadOnly="True">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Название" Binding="{Binding Title}" Width="*" />
-                <DataGridTextColumn Header="Сумма" Binding="{Binding Principal}" Width="100" />
-                <DataGridTextColumn Header="Контрагент" Binding="{Binding Counterparty}" Width="150" />
-                <DataGridTextColumn Header="Срок до" Binding="{Binding EndDate, StringFormat={}{0:dd.MM.yyyy}}" Width="100" />
-            </DataGrid.Columns>
-        </DataGrid>
+
+        <TextBlock Text="Долги и Кредиты" Grid.Row="0" Grid.ColumnSpan="2" FontSize="20" FontWeight="Bold" Margin="0,0,0,10" />
+
+        <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,10,0">
+            <Button Content="+ Новый долг" Command="{Binding AddDebtCommand}" Margin="0,0,0,10" />
+            <ListBox ItemsSource="{Binding Debts}" SelectedItem="{Binding SelectedDebt}" DisplayMemberPath="Title" Height="300" />
+            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                <Button Content="Изменить" Command="{Binding EditDebtCommand}" CommandParameter="{Binding SelectedDebt}" Width="80" />
+                <Button Content="Удалить" Command="{Binding DeleteDebtCommand}" CommandParameter="{Binding SelectedDebt}" Width="80" Margin="5,0,0,0" />
+            </StackPanel>
+        </StackPanel>
+
+        <Grid Grid.Row="1" Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <TextBlock Text="График платежей" FontWeight="Bold" Margin="0,0,0,5" />
+            <DataGrid Grid.Row="1" ItemsSource="{Binding Schedule}" AutoGenerateColumns="False" IsReadOnly="True">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Дата" Binding="{Binding DueDate, StringFormat={}{0:dd.MM.yyyy}}" Width="100" />
+                    <DataGridTextColumn Header="Сумма" Binding="{Binding AmountDue}" Width="80" />
+                    <DataGridCheckBoxColumn Header="Оплачено" Binding="{Binding IsPaid}" Width="70" />
+                    <DataGridTemplateColumn Width="100">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="Оплатить" Command="{Binding DataContext.MarkPaidCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}" Visibility="{Binding IsPaid, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Inverse}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
     </Grid>
 </UserControl>

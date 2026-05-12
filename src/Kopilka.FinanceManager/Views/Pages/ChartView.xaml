@@ -2,13 +2,17 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              Background="White">
-    <Grid Margin="20">
+    <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <TextBlock Text="Гистограмма доходов и расходов" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" />
 
-        <Canvas x:Name="ChartCanvas" Grid.Row="1" Margin="20" Background="#f8f9fa" />
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+            <Button Content="Назад" Command="{Binding DataContext.NavigateToTransactionsCommand, RelativeSource={RelativeSource AncestorType=Window}}" Margin="0,0,10,0" />
+            <TextBlock Text="График доходов и расходов" FontSize="18" FontWeight="Bold" />
+        </StackPanel>
+
+        <Canvas x:Name="ChartCanvas" Grid.Row="1" Background="#F0F0F0" />
     </Grid>
 </UserControl>

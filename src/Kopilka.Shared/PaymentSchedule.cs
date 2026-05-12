@@ -24,6 +24,16 @@ namespace Kopilka.Shared
         public decimal AmountDue { get; set; }
 
         /// <summary>
+        /// Часть основного долга.
+        /// </summary>
+        public decimal PrincipalPayment { get; set; }
+
+        /// <summary>
+        /// Проценты.
+        /// </summary>
+        public decimal InterestPayment { get; set; }
+
+        /// <summary>
         /// Флаг оплаты.
         /// </summary>
         public bool IsPaid { get; set; }

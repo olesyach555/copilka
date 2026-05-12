@@ -20,127 +20,125 @@ namespace Kopilka.BusinessLogic
                 .ToListAsync();
         }
 
-        public async Task AddDebtContractAsync(DebtContract contract, bool isAnnuity = true)
+        public async Task AddDebtAsync(DebtContract debt)
         {
-            _context.DebtContracts.Add(contract);
+            _context.DebtContracts.Add(debt);
             await _context.SaveChangesAsync();
 
-            if (isAnnuity)
-                await GenerateAnnuityScheduleAsync(contract);
-            else
-                await GenerateDifferentiatedScheduleAsync(contract);
+            await GenerateInitialSchedule(debt);
         }
 
-        private async Task GenerateAnnuityScheduleAsync(DebtContract contract)
+        public async Task UpdateDebtAsync(DebtContract debt)
         {
-            if (!contract.EndDate.HasValue) return;
-
-            int months = GetMonthsBetween(contract.StartDate, contract.EndDate.Value);
-            if (months <= 0) months = 1;
-
-            double monthlyRate = (double)contract.InterestRate / 100 / 12;
-            double annuityRatio = (monthlyRate * Math.Pow(1 + monthlyRate, months)) / (Math.Pow(1 + monthlyRate, months) - 1);
-            decimal monthlyPayment = contract.Principal * (decimal)annuityRatio;
-
-            for (int i = 1; i <= months; i++)
-            {
-                var schedule = new PaymentSchedule
-                {
-                    DebtContractId = contract.Id,
-                    DueDate = contract.StartDate.AddMonths(i),
-                    AmountDue = monthlyPayment,
-                    IsPaid = false
-                };
-                _context.PaymentSchedules.Add(schedule);
-            }
+            _context.Entry(debt).State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }
 
-        private async Task GenerateDifferentiatedScheduleAsync(DebtContract contract)
+        public async Task DeleteDebtAsync(int id)
         {
-            if (!contract.EndDate.HasValue) return;
-
-            int months = GetMonthsBetween(contract.StartDate, contract.EndDate.Value);
-            if (months <= 0) months = 1;
-
-            decimal monthlyPrincipal = contract.Principal / months;
-            decimal remainingPrincipal = contract.Principal;
-
-            for (int i = 1; i <= months; i++)
+            var debt = await _context.DebtContracts.FindAsync(id);
+            if (debt != null)
             {
-                decimal interest = remainingPrincipal * (contract.InterestRate / 100 / 12);
-                decimal totalPayment = monthlyPrincipal + interest;
+                // Сначала удаляем график платежей (хотя в OnModelCreating настроен Cascade)
+                var schedules = _context.PaymentSchedules.Where(s => s.DebtContractId == id);
+                _context.PaymentSchedules.RemoveRange(schedules);
 
-                var schedule = new PaymentSchedule
-                {
-                    DebtContractId = contract.Id,
-                    DueDate = contract.StartDate.AddMonths(i),
-                    AmountDue = totalPayment,
-                    IsPaid = false
-                };
-                _context.PaymentSchedules.Add(schedule);
-                remainingPrincipal -= monthlyPrincipal;
+                _context.DebtContracts.Remove(debt);
+                await _context.SaveChangesAsync();
             }
-            await _context.SaveChangesAsync();
         }
 
-        private int GetMonthsBetween(DateTime start, DateTime end)
-        {
-            return ((end.Year - start.Year) * 12) + end.Month - start.Month;
-        }
-
-        public List<BankOffer> CompareBankOffers(decimal amount, int months, List<BankParameter> banks)
-        {
-            var offers = new List<BankOffer>();
-            foreach (var bank in banks)
-            {
-                double monthlyRate = (double)bank.InterestRate / 100 / 12;
-                double annuityRatio = (monthlyRate * Math.Pow(1 + monthlyRate, months)) / (Math.Pow(1 + monthlyRate, months) - 1);
-                decimal monthlyPayment = amount * (decimal)annuityRatio;
-                decimal totalPayout = monthlyPayment * months;
-
-                offers.Add(new BankOffer
-                {
-                    BankName = bank.Name,
-                    MonthlyPayment = monthlyPayment,
-                    TotalPayout = totalPayout,
-                    Overpayment = totalPayout - amount
-                });
-            }
-            return offers.OrderBy(o => o.TotalPayout).ToList();
-        }
-
-        public async Task<List<PaymentSchedule>> GetPaymentScheduleAsync(int contractId)
+        public async Task<List<PaymentSchedule>> GetScheduleAsync(int debtId)
         {
             return await _context.PaymentSchedules
-                .Where(p => p.DebtContractId == contractId)
+                .Where(p => p.DebtContractId == debtId)
                 .OrderBy(p => p.DueDate)
                 .ToListAsync();
         }
 
         public async Task MarkAsPaidAsync(int scheduleId)
         {
-            var schedule = await _context.PaymentSchedules.FindAsync(scheduleId);
-            if (schedule != null)
+            var item = await _context.PaymentSchedules.FindAsync(scheduleId);
+            if (item != null)
             {
-                schedule.IsPaid = true;
-                schedule.PaidDate = DateTime.Now;
+                item.IsPaid = true;
+                item.PaidDate = DateTime.Now;
                 await _context.SaveChangesAsync();
+
+                var debt = await _context.DebtContracts.FindAsync(item.DebtContractId);
+                if (debt != null)
+                {
+                    var category = await _context.Categories.FirstOrDefaultAsync(c => c.Name == "Долги" && c.UserId == debt.UserId);
+                    if (category == null)
+                    {
+                        category = new Category { Name = "Долги", IsIncome = false, UserId = debt.UserId };
+                        _context.Categories.Add(category);
+                        await _context.SaveChangesAsync();
+                    }
+
+                    var transaction = new Transaction
+                    {
+                        UserId = debt.UserId,
+                        Amount = item.AmountDue,
+                        Date = DateTime.Now,
+                        Comment = $"Оплата по долгу: {debt.Title}",
+                        CategoryId = category.Id
+                    };
+                    _context.Transactions.Add(transaction);
+                    await _context.SaveChangesAsync();
+                }
             }
         }
-    }
 
-    public class BankParameter
-    {
-        public string Name { get; set; } = string.Empty;
-        public decimal InterestRate { get; set; }
-    }
+        private async Task GenerateInitialSchedule(DebtContract debt)
+        {
+            int months = 12;
+            if (debt.EndDate.HasValue)
+            {
+                months = ((debt.EndDate.Value.Year - debt.StartDate.Year) * 12) + debt.EndDate.Value.Month - debt.StartDate.Month;
+                if (months <= 0) months = 1;
+            }
 
-    public class BankOffer
-    {
-        public string BankName { get; set; } = string.Empty;
-        public decimal MonthlyPayment { get; set; }
-        public decimal TotalPayout { get; set; }
-        public decimal Overpayment { get; set; }
+            // Аннуитетный платеж
+            double rate = (double)debt.InterestRate / 100 / 12;
+            decimal monthlyPayment;
+
+            if (rate > 0)
+            {
+                double factor = (rate * Math.Pow(1 + rate, months)) / (Math.Pow(1 + rate, months) - 1);
+                monthlyPayment = (decimal)((double)debt.Principal * factor);
+            }
+            else
+            {
+                monthlyPayment = debt.Principal / months;
+            }
+
+            decimal remainingPrincipal = debt.Principal;
+
+            for (int i = 1; i <= months; i++)
+            {
+                decimal interestPayment = remainingPrincipal * (debt.InterestRate / 100 / 12);
+                decimal principalPayment = monthlyPayment - interestPayment;
+
+                if (i == months) // Корректировка последнего платежа
+                {
+                    principalPayment = remainingPrincipal;
+                    monthlyPayment = principalPayment + interestPayment;
+                }
+
+                var schedule = new PaymentSchedule
+                {
+                    DebtContractId = debt.Id,
+                    DueDate = debt.StartDate.AddMonths(i),
+                    PrincipalPayment = principalPayment,
+                    InterestPayment = interestPayment,
+                    AmountDue = monthlyPayment,
+                    IsPaid = false
+                };
+                _context.PaymentSchedules.Add(schedule);
+                remainingPrincipal -= principalPayment;
+            }
+            await _context.SaveChangesAsync();
+        }
     }
 }

@@ -9,27 +9,52 @@ namespace Kopilka.FinanceManager
 {
     public partial class App : Application
     {
+        private ApplicationDbContext? _context;
+        private AuthService? _authService;
+        private TransactionService? _transactionService;
+        private CategoryService? _categoryService;
+        private DebtService? _debtService;
+        private GoalService? _goalService;
+        private ReminderService? _reminderService;
+        private UserService? _userService;
+
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            var context = new ApplicationDbContext();
+            _context = new ApplicationDbContext();
+            _context.Database.Migrate();
+            SeedData(_context);
 
-            // Применяем миграции и сидируем данные
-            context.Database.Migrate();
-            SeedData(context);
+            _authService = new AuthService(_context);
+            _transactionService = new TransactionService(_context);
+            _categoryService = new CategoryService(_context);
+            _debtService = new DebtService(_context);
+            _goalService = new GoalService(_context);
+            _reminderService = new ReminderService(_context);
+            _userService = new UserService(_context);
 
-            var authService = new AuthService(context);
-            var transactionService = new TransactionService(context);
-            var debtService = new DebtService(context);
-            var goalService = new GoalService(context);
-            var reminderService = new ReminderService(context);
+            ShowLoginWindow();
+        }
 
-            var authViewModel = new AuthViewModel(authService);
+        public void ShowLoginWindow()
+        {
+            if (_authService == null) return;
+
+            var authViewModel = new AuthViewModel(_authService);
             var loginWindow = new LoginWindow(authViewModel);
 
             if (loginWindow.ShowDialog() == true && loginWindow.Tag is User authenticatedUser)
             {
-                var mainViewModel = new MainViewModel(transactionService, debtService, goalService, reminderService, authenticatedUser.Id);
-                var mainWindow = new MainWindow(mainViewModel, authService, transactionService, debtService, goalService, reminderService);
+                var mainViewModel = new MainViewModel(
+                    _transactionService!,
+                    _categoryService!,
+                    _debtService!,
+                    _goalService!,
+                    _reminderService!,
+                    _authService!,
+                    _userService!,
+                    authenticatedUser.Id);
+
+                var mainWindow = new MainWindow(mainViewModel);
                 mainWindow.Show();
             }
             else

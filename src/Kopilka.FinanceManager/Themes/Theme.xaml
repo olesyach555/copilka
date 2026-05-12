@@ -17,6 +17,8 @@
     <SolidColorBrush x:Key="TextOnDarkBrush" Color="{StaticResource TextOnDark}" />
     <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}" />
 
+    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+
     <Style TargetType="Window">
         <Setter Property="Background" Value="{StaticResource WindowBackgroundBrush}" />
         <Setter Property="Foreground" Value="{StaticResource TextForegroundBrush}" />

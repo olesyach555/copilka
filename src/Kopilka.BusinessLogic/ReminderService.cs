@@ -17,7 +17,7 @@ namespace Kopilka.BusinessLogic
         {
             return await _context.Reminders
                 .Include(r => r.TransactionCategory)
-                .Where(r => r.UserId == userId && r.ReminderDate >= DateTime.Now)
+                .Where(r => r.UserId == userId)
                 .OrderBy(r => r.ReminderDate)
                 .ToListAsync();
         }
@@ -25,6 +25,12 @@ namespace Kopilka.BusinessLogic
         public async Task AddReminderAsync(Reminder reminder)
         {
             _context.Reminders.Add(reminder);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateReminderAsync(Reminder reminder)
+        {
+            _context.Entry(reminder).State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }
 

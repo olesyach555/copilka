@@ -13,7 +13,7 @@ namespace Kopilka.BusinessLogic
             _context = context;
         }
 
-        public async Task<List<Transaction>> GetTransactionsAsync(int userId, DateTime? start = null, DateTime? end = null)
+        public async Task<List<Transaction>> GetTransactionsAsync(int userId, DateTime? start = null, DateTime? end = null, int? categoryId = null)
         {
             var query = _context.Transactions
                 .Include(t => t.Category)
@@ -23,6 +23,8 @@ namespace Kopilka.BusinessLogic
                 query = query.Where(t => t.Date >= start.Value);
             if (end.HasValue)
                 query = query.Where(t => t.Date <= end.Value);
+            if (categoryId.HasValue)
+                query = query.Where(t => t.CategoryId == categoryId.Value);
 
             return await query.OrderByDescending(t => t.Date).ToListAsync();
         }
@@ -35,7 +37,7 @@ namespace Kopilka.BusinessLogic
 
         public async Task UpdateTransactionAsync(Transaction transaction)
         {
-            _context.Transactions.Update(transaction);
+            _context.Entry(transaction).State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }
 
@@ -51,11 +53,14 @@ namespace Kopilka.BusinessLogic
 
         public async Task<decimal> GetTotalBalanceAsync(int userId)
         {
+            // SQLite SumAsync decimal issue: cast to double inside the query
             var income = await _context.Transactions
+                .Include(t => t.Category)
                 .Where(t => t.UserId == userId && t.Category.IsIncome)
                 .SumAsync(t => (double)t.Amount);
 
             var expense = await _context.Transactions
+                .Include(t => t.Category)
                 .Where(t => t.UserId == userId && !t.Category.IsIncome)
                 .SumAsync(t => (double)t.Amount);
 

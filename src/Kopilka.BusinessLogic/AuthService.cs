@@ -28,6 +28,13 @@ namespace Kopilka.BusinessLogic
             return null;
         }
 
+        public async Task<User?> GetUserByIdAsync(int userId)
+        {
+            return await _context.Users
+                .Include(u => u.Family)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+        }
+
         public async Task<User?> RegisterUserAsync(string login, string password, string role = "Parent")
         {
             if (await _context.Users.AnyAsync(u => u.Login == login))
@@ -64,7 +71,7 @@ namespace Kopilka.BusinessLogic
             var family = new Family
             {
                 Name = familyName,
-                HomePassword = homePassword // В ТЗ не сказано хешировать, но для безопасности стоило бы. Оставим как в ТЗ.
+                HomePassword = homePassword
             };
 
             _context.Families.Add(family);
@@ -74,6 +81,19 @@ namespace Kopilka.BusinessLogic
             await _context.SaveChangesAsync();
 
             return family;
+        }
+
+        public async Task<bool> JoinFamilyByNameAsync(int userId, string familyName, string homePassword)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            var family = await _context.Families.FirstOrDefaultAsync(f => f.Name == familyName);
+
+            if (user == null || family == null || family.HomePassword != homePassword)
+                return false;
+
+            user.FamilyId = family.Id;
+            await _context.SaveChangesAsync();
+            return true;
         }
 
         public async Task<bool> JoinFamilyAsync(int userId, int familyId, string homePassword)
