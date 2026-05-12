@@ -27,6 +27,7 @@ namespace Kopilka.BusinessLogic.ViewModels
         [RelayCommand]
         public async Task LoginAsync()
         {
+            ErrorMessage = null;
             var user = await _authService.LoginAsync(Login, Password);
             if (user != null)
             {
@@ -41,6 +42,13 @@ namespace Kopilka.BusinessLogic.ViewModels
         [RelayCommand]
         public async Task RegisterAsync()
         {
+            ErrorMessage = null;
+            if (string.IsNullOrWhiteSpace(Login) || string.IsNullOrWhiteSpace(Password))
+            {
+                ErrorMessage = "Введите логин и пароль";
+                return;
+            }
+
             var user = await _authService.RegisterUserAsync(Login, Password);
             if (user != null)
             {

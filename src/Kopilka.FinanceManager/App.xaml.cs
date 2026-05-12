@@ -20,6 +20,9 @@ namespace Kopilka.FinanceManager
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
+            // Предотвращаем закрытие приложения при закрытии промежуточных окон
+            this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
             _context = new ApplicationDbContext();
             _context.Database.Migrate();
             SeedData(_context);
@@ -55,7 +58,11 @@ namespace Kopilka.FinanceManager
                     authenticatedUser.Id);
 
                 var mainWindow = new MainWindow(mainViewModel);
+                this.MainWindow = mainWindow;
                 mainWindow.Show();
+
+                // Теперь можно вернуть режим закрытия по умолчанию
+                this.ShutdownMode = ShutdownMode.OnLastWindowClose;
             }
             else
             {

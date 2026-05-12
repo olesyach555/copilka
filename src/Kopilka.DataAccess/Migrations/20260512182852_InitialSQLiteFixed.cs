@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Kopilka.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialSQLite : Migration
+    public partial class InitialSQLiteFixed : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -252,6 +252,8 @@ namespace Kopilka.DataAccess.Migrations
                     DebtContractId = table.Column<int>(type: "INTEGER", nullable: false),
                     DueDate = table.Column<DateTime>(type: "TEXT", nullable: false),
                     AmountDue = table.Column<decimal>(type: "TEXT", precision: 18, scale: 2, nullable: false),
+                    PrincipalPayment = table.Column<decimal>(type: "TEXT", precision: 18, scale: 2, nullable: false),
+                    InterestPayment = table.Column<decimal>(type: "TEXT", precision: 18, scale: 2, nullable: false),
                     IsPaid = table.Column<bool>(type: "INTEGER", nullable: false),
                     PaidDate = table.Column<DateTime>(type: "TEXT", nullable: true)
                 },

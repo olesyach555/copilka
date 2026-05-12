@@ -16,9 +16,12 @@ namespace Kopilka.FinanceManager
             DataContext = _viewModel;
             _viewModel.OnAuthenticated += (user) =>
             {
-                this.DialogResult = true;
-                this.Tag = user;
-                this.Close();
+                Dispatcher.Invoke(() =>
+                {
+                    this.DialogResult = true;
+                    this.Tag = user;
+                    this.Close();
+                });
             };
         }
 

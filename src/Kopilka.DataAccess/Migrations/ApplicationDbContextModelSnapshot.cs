@@ -208,10 +208,18 @@ namespace Kopilka.DataAccess.Migrations
                     b.Property<DateTime>("DueDate")
                         .HasColumnType("TEXT");
 
+                    b.Property<decimal>("InterestPayment")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("IsPaid")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("PaidDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("PrincipalPayment")
+                        .HasPrecision(18, 2)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
