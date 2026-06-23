@@ -23,4 +23,14 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.6" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Page Include="Views\Pages\AccountsPage.xaml" />
+    <Page Include="Views\Pages\CategoriesPage.xaml" />
+    <Page Include="Views\Pages\ChartsPage.xaml" />
+    <Page Include="Views\Pages\HomePage.xaml" />
+    <Page Include="Views\Pages\RegularPaymentsPage.xaml" />
+    <Page Include="Views\Pages\RemindersPage.xaml" />
+    <Page Include="Views\Pages\SettingsPage.xaml" />
+    <Page Include="Views\Pages\WelcomePage.xaml" />
+  </ItemGroup>
 </Project>
